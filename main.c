@@ -1,9 +1,13 @@
-#include "raylib.h"
-#include "raymath.h"
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 
-#include "utils.h"
+#include "raylib.h"
+#include "raymath.h"
+
+#include "data.h"
+#include "drawing.h"
+#include "mathUtils.h"
 #include "constants.h"
 
 #define DARKRED (Color){80, 10, 50, 255}
@@ -12,23 +16,25 @@ const int W_WIDTH = 1200;
 const int W_HEIGHT = 960;
 const int TARGET_FPS = 60;
 
-void handleInputs(Demon *demon) {
+void handleInputs(Demon *demon, Camera2D camera) {
     float accel = 3.5;
-    if (IsKeyDown(KEY_A)) demon->vel.x -= accel;
-    if (IsKeyDown(KEY_D)) demon->vel.x += accel;
-    if (IsKeyDown(KEY_W)) demon->vel.y -= accel;
-    if (IsKeyDown(KEY_S)) demon->vel.y += accel;
-    if (IsKeyDown(KEY_SPACE) && demon->height == 0) demon->zVel = 8;
-    demon->targetPos = GetMousePosition();
+    if (demon->height == 0) {
+        if (IsKeyDown(KEY_A)) demon->vel.x -= accel;
+        if (IsKeyDown(KEY_D)) demon->vel.x += accel;
+        if (IsKeyDown(KEY_W)) demon->vel.y -= accel;
+        if (IsKeyDown(KEY_S)) demon->vel.y += accel;
+        if (IsKeyDown(KEY_SPACE)) demon->zVel = 8;
+    }
+    demon->targetPos = GetScreenToWorld2D(GetMousePosition(), camera);
 
-    if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON) && !demon->lHand.flying) {
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !demon->lHand.flying) {
         demon->lHand.flying = true;
-        demon->lHand.targetPos = GetMousePosition();
+        demon->lHand.targetPos = GetScreenToWorld2D(GetMousePosition(), camera);
         demon->lHand.speed = 3;
     }
     if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) && !demon->rHand.flying) {
         demon->rHand.flying = true;
-        demon->rHand.targetPos = GetMousePosition();
+        demon->rHand.targetPos = GetScreenToWorld2D(GetMousePosition(), camera);
         demon->rHand.speed = 3;
     }
 }
@@ -39,12 +45,12 @@ void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot) {
     if (!hand->flying) {
         Vector2 handOffset = Vector2Rotate(neutralOffset, DEG2RAD * rot);
         Vector2 targetPos = Vector2Add(basePos, handOffset);
-        MoveTowardsPoint((Entity *)hand, targetPos, hand->speed);
+        MoveTowardsPoint(&hand->pos, targetPos, hand->speed);
         float waving = sin(GetTime() * 4);
         hand->rot = rot - INITIAL_ROT_OFFSET + waving * 2;
     } else {
         hand->speed += hand->speed / 10;
-        MoveTowardsPoint((Entity *)hand,
+        MoveTowardsPoint(&hand->pos,
                          hand->targetPos,
                          hand->speed);
         Vector2 toTarget = Vector2Subtract(hand->targetPos,
@@ -68,12 +74,11 @@ void updateHands(Demon *demon, float delta) {
 }
 
 void update(Demon *demon, float delta) {
-    demon->vel = Vector2Scale(demon->vel, 0.75);
-    demon->pos.x += demon->vel.x;
-    demon->pos.y += demon->vel.y;
+    if (demon->height == 0) demon->vel = Vector2Scale(demon->vel, 0.75);
     if (Vector2Length(demon->vel) > 5) {
         demon->vel = Vector2ToLength(demon->vel, 5);
     }
+    demon->pos = Vector2Add(demon->pos, demon->vel);
     demon->rot = Vector2Angle(demon->targetPos, demon->pos) + 90;
     updateHands(demon, delta);
 
@@ -85,10 +90,7 @@ void update(Demon *demon, float delta) {
     }
 }
 
-int main() {
-    InitWindow(W_WIDTH, W_HEIGHT, "Test");
-    SetTargetFPS(TARGET_FPS);
-    float EXPECTED_FRAME_TIME = 1 / TARGET_FPS;
+Demon initDemon() {
     Vector2 demonStartPos = (Vector2){W_WIDTH / 2, W_HEIGHT / 2};
     Image hand = LoadImage("assets/demon_hand.png");
     Hand rHand = {
@@ -110,7 +112,7 @@ int main() {
     };
     UnloadImage(hand);
 
-    Demon demon = {
+    return (Demon) {
         LoadTexture("assets/demon_head.png"),
         demonStartPos,
         Vector2Zero(),
@@ -119,19 +121,70 @@ int main() {
         rHand, lHand,
         0.0, 0.0,
     };
+}
+
+bool isLava(int x, int y) {
+    int c = x * x + y * y;
+    return c > 250 && c < 500;
+}
+
+Map initMap() {
+    Map map;
+    for(int x = 0; x < MAP_WIDTH; x++) {
+        for(int y = 0; y < MAP_HEIGHT; y++) {
+            if (isLava(x, y)) {
+                map.tiles[x][y] = (Tile){LoadTexture("assets/lava_0.png")};
+            } else {
+                char *texName = (char *)malloc(50 * sizeof(char));
+                sprintf(texName,
+                        "assets/tomb_%d_%s.png",
+                        x % 4,
+                        y % 2 == 0 ? "old" : "new");
+                map.tiles[x][y] = (Tile){LoadTexture(texName)};
+                free(texName);
+            }
+        }
+    }
+    return map;
+}
+
+void drawMap(Map map) {
+    for(int x = 0; x < MAP_WIDTH; x++) {
+        for(int y = 0; y < MAP_HEIGHT; y++) {
+            Texture tex = map.tiles[x][y].texture;
+            DrawTexture(tex, x * tex.width, y * tex.height, WHITE);
+        }
+    }
+}
+
+int main() {
+    InitWindow(W_WIDTH, W_HEIGHT, "Test");
+    SetTargetFPS(TARGET_FPS);
+    Camera2D camera;
+    camera.target = Vector2Zero();
+    camera.offset = (Vector2){W_WIDTH / 2, W_HEIGHT / 2};
+    camera.rotation = 0;
+    camera.zoom = 1;
+    float EXPECTED_FRAME_TIME = 1 / TARGET_FPS;
+    Demon demon = initDemon();
+    Map map = initMap();
     int w = demon.texture.width;
     int h = demon.texture.height;
 
     while (!WindowShouldClose()) {
         ClearBackground(WHITE);
-        handleInputs(&demon);
+        handleInputs(&demon, camera);
         update(&demon, GetFrameTime() / EXPECTED_FRAME_TIME);
+        camera.target = demon.pos;
 
         BeginDrawing();
+        BeginMode2D(camera);
+            drawMap(map);
             Rectangle body = (Rectangle) {demon.pos.x, demon.pos.y, 2 * w, h};
             DrawEntity((Entity *)(&demon.rHand));
             DrawEntity((Entity *)(&demon.lHand));
-            DrawEntityScaled((Entity *)&demon, 1 + (demon.height) / 30);
+            DrawEntityScaled((Entity *)&demon, 1 + (demon.height) / 80);
+        EndMode2D();
         EndDrawing();
     }
 
