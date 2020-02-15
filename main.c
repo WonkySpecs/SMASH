@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <math.h>
-#include <stdlib.h>
 
 #include "raylib.h"
 #include "raymath.h"
@@ -8,6 +7,7 @@
 #include "data.h"
 #include "drawing.h"
 #include "mathUtils.h"
+#include "world.h"
 #include "constants.h"
 
 #define DARKRED (Color){80, 10, 50, 255}
@@ -31,11 +31,19 @@ void handleInputs(Demon *demon, Camera2D camera) {
         demon->lHand.flying = true;
         demon->lHand.targetPos = GetScreenToWorld2D(GetMousePosition(), camera);
         demon->lHand.speed = 3;
+        demon->lHand.rot = Vector2Angle(demon->lHand.pos,
+                                        demon->lHand.targetPos) - 90;
     }
-    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) && !demon->rHand.flying) {
+    // Third condition works around a problem (bug?) where all buttons are 
+    // 'pressed' when lift click is held.
+    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)
+        && !demon->rHand.flying
+        && !IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         demon->rHand.flying = true;
         demon->rHand.targetPos = GetScreenToWorld2D(GetMousePosition(), camera);
         demon->rHand.speed = 3;
+        demon->rHand.rot = Vector2Angle(demon->rHand.pos,
+                                        demon->rHand.targetPos) - 90;
     }
 }
 
@@ -121,40 +129,6 @@ Demon initDemon() {
         rHand, lHand,
         0.0, 0.0,
     };
-}
-
-bool isLava(int x, int y) {
-    int c = x * x + y * y;
-    return c > 250 && c < 500;
-}
-
-Map initMap() {
-    Map map;
-    for(int x = 0; x < MAP_WIDTH; x++) {
-        for(int y = 0; y < MAP_HEIGHT; y++) {
-            if (isLava(x, y)) {
-                map.tiles[x][y] = (Tile){LoadTexture("assets/lava_0.png")};
-            } else {
-                char *texName = (char *)malloc(50 * sizeof(char));
-                sprintf(texName,
-                        "assets/tomb_%d_%s.png",
-                        x % 4,
-                        y % 2 == 0 ? "old" : "new");
-                map.tiles[x][y] = (Tile){LoadTexture(texName)};
-                free(texName);
-            }
-        }
-    }
-    return map;
-}
-
-void drawMap(Map map) {
-    for(int x = 0; x < MAP_WIDTH; x++) {
-        for(int y = 0; y < MAP_HEIGHT; y++) {
-            Texture tex = map.tiles[x][y].texture;
-            DrawTexture(tex, x * tex.width, y * tex.height, WHITE);
-        }
-    }
 }
 
 int main() {

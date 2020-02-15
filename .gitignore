@@ -3,4 +3,4 @@ build/
 assets/
 CMake*
 !CMakeLists.txt
-
+BUGS

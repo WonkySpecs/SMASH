@@ -9,9 +9,6 @@
     Vector2 vel; \
     float rot;
 
-#define MAP_WIDTH 50
-#define MAP_HEIGHT 40
-
 typedef struct Entity {
     BASEFIELDS;
 } Entity;
@@ -31,12 +28,4 @@ typedef struct Demon {
     float height;
     float zVel;
 } Demon;
-
-typedef struct Tile {
-    Texture2D texture;
-} Tile;
-
-typedef struct Map {
-    Tile tiles[MAP_WIDTH][MAP_HEIGHT];
-} Map;
 #endif
