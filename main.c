@@ -45,7 +45,7 @@ void handleInputs(Demon *demon, Camera2D camera) {
     }
 }
 
-void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot) {
+bool moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot) {
     Vector2 toTarget;
 
     if (!hand->flying) {
@@ -64,8 +64,10 @@ void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot) {
         if (Vector2Length(toTarget) < 2) {
             hand->flying = false;
             hand->speed = NEUTRAL_HAND_SPEED;
+            return true;
         }
     }
+    return false;
 
 }
 
@@ -75,8 +77,12 @@ void updateHands(Demon *demon, float delta) {
                                     Y_OFFSET + waving * 2};
     Vector2 lHandOffset = (Vector2){X_OFFSET - waving * 3,
                                     Y_OFFSET + waving * 2};
-    moveHand(&demon->rHand, demon->pos, rHandOffset, demon->rot);
-    moveHand(&demon->lHand, demon->pos, lHandOffset, demon->rot);
+    if(moveHand(&demon->rHand, demon->pos, rHandOffset, demon->rot)) {
+        demon->trauma += 0.2;
+    }
+    if(moveHand(&demon->lHand, demon->pos, lHandOffset, demon->rot)) {
+        demon->trauma += 0.2;
+    }
 }
 
 void update(Demon *demon, float delta) {
@@ -102,6 +108,7 @@ void update(Demon *demon, float delta) {
         demon->height = 0;
         demon->zVel = 0;
     }
+    if (demon->trauma > 1) demon->trauma = 1;
 }
 
 Demon initDemon() {
