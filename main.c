@@ -154,7 +154,6 @@ int main() {
         BeginDrawing();
         BeginMode2D(camera);
             drawMap(map);
-            Rectangle body = (Rectangle) {demon.pos.x, demon.pos.y, 2 * w, h};
             DrawEntity((Entity *)(&demon.rHand));
             DrawEntity((Entity *)(&demon.lHand));
             DrawEntityScaled((Entity *)&demon, 1 + (demon.height) / 80);
