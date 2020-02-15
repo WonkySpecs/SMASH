@@ -1,0 +1,6 @@
+*.swp
+build/
+assets/
+CMake*
+!CMakeLists.txt
+
