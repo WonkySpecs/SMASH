@@ -1,7 +1,6 @@
 #ifndef __DATA
 #define __DATA
 #include "raylib.h"
-#include <math.h>
 
 #define BASEFIELDS \
     Texture2D texture; \
@@ -27,5 +26,6 @@ typedef struct Demon {
     Hand lHand;
     float height;
     float zVel;
+    float trauma; // Not convinced this should be here
 } Demon;
 #endif

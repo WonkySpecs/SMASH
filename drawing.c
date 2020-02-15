@@ -1,4 +1,7 @@
+#include "utils.h"
+#include "raymath.h"
 #include "drawing.h"
+#include "constants.h"
 
 void DrawEntityScaled(Entity *e, float scale) {
     Texture tex = e->texture;
@@ -14,4 +17,13 @@ void DrawEntityScaled(Entity *e, float scale) {
 
 void DrawEntity(Entity *e) {
     DrawEntityScaled(e, 1.0);
+}
+
+void updateCamera(Camera2D *camera, Demon demon) {
+    camera->target = demon.pos;
+    float baseOffset = 30 * demon.trauma * demon.trauma;
+    camera->offset = Vector2Add((Vector2){W_WIDTH / 2, W_HEIGHT / 2},
+                                (Vector2){baseOffset * randFloat(),
+                                          baseOffset * randFloat()});
+    camera->rotation = 5 * demon.trauma * demon.trauma * (randFloat() - 0.5);
 }

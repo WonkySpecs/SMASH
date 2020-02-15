@@ -12,8 +12,6 @@
 
 #define DARKRED (Color){80, 10, 50, 255}
 
-const int W_WIDTH = 1200;
-const int W_HEIGHT = 960;
 const int TARGET_FPS = 60;
 
 void handleInputs(Demon *demon, Camera2D camera) {
@@ -90,9 +88,17 @@ void update(Demon *demon, float delta) {
     demon->rot = Vector2Angle(demon->targetPos, demon->pos) + 90;
     updateHands(demon, delta);
 
+    bool wasInAir = demon->height > 0;
     demon->height += demon->zVel;
-    demon->zVel -= 0.5;
-    if (demon-> height <= 0) {
+    bool inAir = demon->height > 0;
+
+    if (wasInAir && !inAir) {
+        demon->trauma += 0.5;
+    }
+
+    if (inAir) {
+        demon->zVel -= 0.5;
+    } else {
         demon->height = 0;
         demon->zVel = 0;
     }
@@ -127,29 +133,33 @@ Demon initDemon() {
         0.0,
         Vector2Zero(),
         rHand, lHand,
-        0.0, 0.0,
+        0.0, 0.0, 0.0
     };
 }
 
 int main() {
     InitWindow(W_WIDTH, W_HEIGHT, "Test");
     SetTargetFPS(TARGET_FPS);
+
+    Demon demon = initDemon();
+    Map map = initMap();
+
     Camera2D camera;
-    camera.target = Vector2Zero();
+    camera.target = demon.pos;
     camera.offset = (Vector2){W_WIDTH / 2, W_HEIGHT / 2};
     camera.rotation = 0;
     camera.zoom = 1;
+
     float EXPECTED_FRAME_TIME = 1 / TARGET_FPS;
-    Demon demon = initDemon();
-    Map map = initMap();
     int w = demon.texture.width;
     int h = demon.texture.height;
 
     while (!WindowShouldClose()) {
+        if (demon.trauma > 0) demon.trauma -= 0.01;
         ClearBackground(WHITE);
         handleInputs(&demon, camera);
         update(&demon, GetFrameTime() / EXPECTED_FRAME_TIME);
-        camera.target = demon.pos;
+        updateCamera(&camera, demon);
 
         BeginDrawing();
         BeginMode2D(camera);
@@ -159,6 +169,7 @@ int main() {
             DrawEntityScaled((Entity *)&demon, 1 + (demon.height) / 80);
         EndMode2D();
         EndDrawing();
+        camera.rotation = 0;
     }
 
     UnloadTexture(demon.texture);
