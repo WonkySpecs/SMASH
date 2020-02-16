@@ -2,9 +2,9 @@
 #define __DRAWING
 
 #include "raylib.h"
-#include "data.h"
+#include "entities.h"
 
-void DrawEntityScaled(Entity *e, float scale);
-void DrawEntity(Entity *e);
+void drawEntityScaled(Entity *e, float scale);
+void drawEntity(Entity *e);
 void updateCamera(Camera2D *camera, Demon demon);
 #endif

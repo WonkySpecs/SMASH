@@ -2,8 +2,9 @@
 #include "raymath.h"
 #include "drawing.h"
 #include "constants.h"
+#include "mathUtils.h"
 
-void DrawEntityScaled(Entity *e, float scale) {
+void drawEntityScaled(Entity *e, float scale) {
     Texture tex = e->texture;
     float w = tex.width;
     float h = tex.height;
@@ -15,8 +16,8 @@ void DrawEntityScaled(Entity *e, float scale) {
                    WHITE);
 }
 
-void DrawEntity(Entity *e) {
-    DrawEntityScaled(e, 1.0);
+void drawEntity(Entity *e) {
+    drawEntityScaled(e, 1.0);
 }
 
 void updateCamera(Camera2D *camera, Demon demon) {

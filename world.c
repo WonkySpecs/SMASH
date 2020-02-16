@@ -1,4 +1,6 @@
 #include "world.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 bool isLava(int x, int y) {
     int c = x * x + y * y;
