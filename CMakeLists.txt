@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.11) # FetchContent is available in 3.11+
 project(demon-SMASH)
 
 # Set this to the minimal version you want to support
-find_package(raylib 2.5 QUIET) # Let CMake search for a raylib-config.cmake
+find_package(raylib 2.6 QUIET) # Let CMake search for a raylib-config.cmake
 
 # You could change the QUIET above to REQUIRED and remove this if() clause
 # This part downloads raylib and builds it if it's not installed on your system
@@ -31,7 +31,7 @@ endif()
 
 # This is the main part:
 
-add_executable(${PROJECT_NAME} main.c drawing.c mathUtils.c world.c entities.c utils.c)
+add_executable(${PROJECT_NAME} main.c drawing.c mathUtils.c world.c entities.c utils.c particles.c)
 #set(raylib_VERBOSE 1)
 target_link_libraries(${PROJECT_NAME} raylib)
 # That's it! You should have an example executable that you can run. Have fun!

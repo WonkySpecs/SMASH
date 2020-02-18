@@ -3,6 +3,7 @@
 
 #include "raylib.h"
 #include "constants.h"
+#include "particles.h"
 
 #define BASEFIELDS \
     Texture2D texture; \
@@ -19,6 +20,7 @@ typedef struct Hand {
     float speed;
     bool flying;
     Vector2 targetPos;
+    ParticleEmitter trail;
 } Hand;
 
 typedef struct Demon {

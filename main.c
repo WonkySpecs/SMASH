@@ -8,6 +8,7 @@
 #include "world.h"
 #include "constants.h"
 #include "mathUtils.h"
+#include "particles.h"
 
 const int TARGET_FPS = 60;
 
@@ -60,17 +61,25 @@ int main() {
     camera.rotation = 0;
     camera.zoom = 1;
 
-    float EXPECTED_FRAME_TIME = 1 / TARGET_FPS;
+    float EXPECTED_FRAME_TIME = 1 / (float)TARGET_FPS;
     int w = demon.texture.width;
     int h = demon.texture.height;
 
+    RenderTexture2D particleTex = LoadRenderTexture(W_WIDTH, W_HEIGHT);
+    BeginTextureMode(particleTex);
+    ClearBackground(WHITE);
+    EndTextureMode();
+
     while (!WindowShouldClose()) {
+        float delta = GetFrameTime() / EXPECTED_FRAME_TIME;
         if (demon.trauma > 0) demon.trauma -= 0.01;
         ClearBackground(WHITE);
         handleInputs(&demon, camera);
-        updateDemon(&demon, GetFrameTime() / EXPECTED_FRAME_TIME);
+        updateDemon(&demon, delta);
         updateCamera(&camera, demon);
         updateEnemies(&world);
+        demon.rHand.trail.pos = demon.rHand.pos;
+        updateParticles(&demon.rHand.trail, delta);
 
         BeginDrawing();
         BeginMode2D(camera);
@@ -79,6 +88,15 @@ int main() {
             drawEntity((Entity *)(&demon.rHand));
             drawEntity((Entity *)(&demon.lHand));
             drawEntityScaled((Entity *)&demon, 1 + (demon.height) / 80);
+            BeginTextureMode(particleTex);
+                ClearBackground(BLANK);
+                drawParticles(&demon.rHand.trail, camera);
+            EndTextureMode();
+            DrawTextureRec(particleTex.texture,
+                           (Rectangle){ 0, 0,
+                                        particleTex.texture.width, 
+                                        -particleTex.texture.height },
+                           (Vector2){ 0, 0 }, WHITE);
         EndMode2D();
         EndDrawing();
         camera.rotation = 0;

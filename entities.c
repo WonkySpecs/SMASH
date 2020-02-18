@@ -1,10 +1,11 @@
+#include <stdio.h>
+
 #include "entities.h"
 #include "raymath.h"
 #include "mathUtils.h"
 #include "constants.h"
 #include "drawing.h"
-
-#include <stdio.h>
+#include "particles.h"
 
 void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot);
 void updateHands(Demon *demon, float delta); 
@@ -19,6 +20,10 @@ Demon initDemon() {
         0,
         NEUTRAL_HAND_SPEED,
         false,
+        Vector2Zero(),
+        newParticleEmitter(demonStartPos,
+                           LoadTexture("assets/lava_0.png"),
+                           LoadShader(0, "shaders/trailing_fire.fs")),
     };
     ImageFlipHorizontal(&hand);
     Hand lHand = {
