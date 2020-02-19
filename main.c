@@ -79,7 +79,7 @@ int main() {
         updateCamera(&camera, demon);
         updateEnemies(&world);
         demon.rHand.trail.pos = demon.rHand.pos;
-        updateParticles(&demon.rHand.trail, delta);
+        updateParticleEmitter(&demon.rHand.trail, delta);
 
         BeginDrawing();
         BeginMode2D(camera);

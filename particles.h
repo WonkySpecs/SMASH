@@ -17,9 +17,11 @@ typedef struct ParticleEmitter {
     Texture2D texture;
     Shader shader;
     Vector2 pos;
+    float emissionRate;
+    float sinceEmission;
 } ParticleEmitter;
 
 ParticleEmitter newParticleEmitter(Vector2 pos, Texture2D texture, Shader shader);
-void updateParticles(ParticleEmitter *emitter, float delta);
+void updateParticleEmitter(ParticleEmitter *emitter, float delta);
 void drawParticles(ParticleEmitter *emitter, Camera2D camera);
 #endif

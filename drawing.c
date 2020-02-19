@@ -4,6 +4,8 @@
 #include "constants.h"
 #include "mathUtils.h"
 
+Vector2 lastCameraTarget = {9999, 0};
+
 void drawEntityScaled(Entity *e, float scale) {
     Texture tex = e->texture;
     float w = tex.width;
@@ -21,7 +23,12 @@ void drawEntity(Entity *e) {
 }
 
 void updateCamera(Camera2D *camera, Demon demon) {
-    camera->target = demon.pos;
+    if (lastCameraTarget.x == 9999) {
+        camera->target = demon.pos;
+    } else {
+        camera->target = Vector2Lerp(lastCameraTarget, demon.pos, 0.08);
+    }
+    lastCameraTarget = camera->target;
     float baseOffset = 30 * demon.trauma * demon.trauma;
     camera->offset = Vector2Add((Vector2){W_WIDTH / 2, W_HEIGHT / 2},
                                 (Vector2){baseOffset * randFloat(),
