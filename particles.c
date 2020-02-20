@@ -42,12 +42,15 @@ void emitParticle(ParticleEmitter *emitter) {
         expandEmitterParticles(emitter);
     }
 
-    // TODO: This should depend on the emitter
-    Vector2 v = (Vector2){randFloat() * 6 - 3, randFloat() * 6 - 3};
-    v = Vector2Scale(v, 3.0 / Vector2Length(v));
+    Vector2 v = (Vector2){randFloat() * 2 + 1, 0};
+    float rot = emitter->facing +
+                        (randFloat() * emitter->emitArc) - emitter->emitArc / 2;
+    float c = cos(rot);
+    float s = sin(rot);
+    v = (Vector2){v.x * c - v.y * s, v.x * s + v.y * c};
 
     Particle *p = &emitter->particles[idx];
-    p->life = 10;
+    p->life = 30;
     p->pos = (Vector2){0, 0};
     p->vel = v;
 }
@@ -77,6 +80,6 @@ ParticleEmitter newParticleEmitter(Vector2 pos, Texture2D texture) {
     }
 
     return (ParticleEmitter) {
-        particles, 10, texture, pos, 50, 50
+        particles, 10, texture, pos, 10, 50, 0, 180 * DEG2RAD
     };
 }

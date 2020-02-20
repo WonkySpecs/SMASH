@@ -18,6 +18,8 @@ typedef struct ParticleEmitter {
     Vector2 pos;
     float emissionRate;
     float sinceEmission;
+    float facing; // rad
+    float emitArc; // rad
 } ParticleEmitter;
 
 ParticleEmitter newParticleEmitter(Vector2 pos, Texture2D texture);
