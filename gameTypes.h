@@ -5,11 +5,12 @@
 #include "constants.h"
 #include "particles.h"
 
-#define BASEFIELDS \
-    Texture2D texture; \
-    Vector2 pos; \
-    Vector2 vel; \
-    float rot;
+#define BASEFIELDS struct {\
+	Texture2D texture;\
+	Vector2 pos;\
+	Vector2 vel;\
+	float rot;\
+}
 
 typedef struct Entity {
     BASEFIELDS;
