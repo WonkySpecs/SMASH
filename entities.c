@@ -22,8 +22,7 @@ Demon initDemon() {
         false,
         Vector2Zero(),
         newParticleEmitter(demonStartPos,
-                           LoadTexture("assets/lava_0.png"),
-                           LoadShader(0, "shaders/trailing_fire.fs")),
+                           LoadTexture("assets/lava_0.png"))
     };
     ImageFlipHorizontal(&hand);
     Hand lHand = {

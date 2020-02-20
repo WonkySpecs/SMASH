@@ -15,7 +15,9 @@ void drawParticles(ParticleEmitter *emitter, Camera2D camera) {
                                 emitter->pos.y + p->pos.y},
                                 camera);
         DrawRectanglePro((Rectangle){pos.x, pos.y, 5, 5},
-                         (Vector2){0.5, 0.5}, RAD2DEG * sin(GetTime()), RED);
+                         (Vector2){0.5, 0.5},
+                         RAD2DEG * sin(GetTime()),
+                         RED);
     }
 }
 
@@ -52,7 +54,7 @@ void updateParticles(ParticleEmitter *emitter, float delta) {
         Particle *p = emitter->particles[i];
         if (p == 0) continue;
         if (p->life <= 0) continue;
-        p->life -= delta;
+        p->life -= 2 * delta;
         p->pos = Vector2Add(p->pos, p->vel);
     }
 }
@@ -66,7 +68,7 @@ void updateParticleEmitter(ParticleEmitter *emitter, float delta) {
 }
 
 const int START_PARTICLES = 10;
-ParticleEmitter newParticleEmitter(Vector2 pos, Texture2D texture, Shader shader) {
+ParticleEmitter newParticleEmitter(Vector2 pos, Texture2D texture) {
     Particle **particles = (Particle **)malloc(sizeof(Particle *) * START_PARTICLES);
     for (int i = 0; i < START_PARTICLES; i++) {
         // I think this is ultra mega inefficent. Should malloc larger blocks
@@ -75,6 +77,6 @@ ParticleEmitter newParticleEmitter(Vector2 pos, Texture2D texture, Shader shader
         particles[i] = p;
     }
     return (ParticleEmitter) {
-        particles, 10, texture, shader, pos, 50, 50
+        particles, 10, texture, pos, 50, 50
     };
 }
