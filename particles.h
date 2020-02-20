@@ -12,7 +12,7 @@ typedef struct Particle {
 } Particle;
 
 typedef struct ParticleEmitter {
-    Particle **particles;
+    Particle *particles;
     int numParticles;
     Texture2D texture;
     Vector2 pos;
