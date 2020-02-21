@@ -33,13 +33,13 @@ Demon initDemon() {
     UnloadImage(hand);
 
     return (Demon) {
-        LoadTexture("assets/demon_head.png"),
-        demonStartPos,
-        Vector2Zero(),
-        0.0,
-        Vector2Zero(),
-        rHand, lHand,
-        0.0, 0.0, 0.0
+        .texture = LoadTexture("assets/demon_head.png"),
+        .pos = demonStartPos,
+        .vel = Vector2Zero(),
+        .rot = 0.0,
+        .targetPos = Vector2Zero(),
+        .rHand = rHand, .lHand = lHand,
+        .height = 0.0, .zVel = 0.0, .trauma = 0.0
     };
 }
 

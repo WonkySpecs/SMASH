@@ -101,7 +101,12 @@ ParticleEmitter newParticleEmitter(Vector2 pos, Texture2D texture) {
     }
 
     return (ParticleEmitter) {
-        particles, 10, texture, false, pos, 0.2, 50, 0, 100 * DEG2RAD
+        .particles = particles,
+        .numParticles = START_PARTICLES,
+        .texture = texture,
+        .active = false,
+        .pos = pos,
+        .emissionRate = 0.2, .sinceEmission = 0, .facing = 0, .emitArc = 100 * DEG2RAD
     };
 }
 
