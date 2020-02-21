@@ -10,16 +10,18 @@
 #include "mathUtils.h"
 #include "particles.h"
 
-const int TARGET_FPS = 60;
+const int TARGET_FPS = 120;
+const int NEUTRAL_FPS = 60;
 
-void handleInputs(Demon *demon, Camera2D camera) {
-    float accel = 3.5;
+void handleInputs(Demon *demon, Camera2D camera, float delta) {
+    float accel = 3.5 * delta;
     if (demon->height == 0) {
         if (IsKeyDown(KEY_A)) demon->vel.x -= accel;
         if (IsKeyDown(KEY_D)) demon->vel.x += accel;
         if (IsKeyDown(KEY_W)) demon->vel.y -= accel;
         if (IsKeyDown(KEY_S)) demon->vel.y += accel;
         if (IsKeyDown(KEY_SPACE)) demon->zVel = 8;
+        demon->breathingFire = IsKeyDown(KEY_E);
     }
     demon->targetPos = GetScreenToWorld2D(GetMousePosition(), camera);
 
@@ -49,7 +51,10 @@ int main() {
 
     Demon demon = initDemon();
     Map map = initMap();
-    World world = { &map, &demon, };
+    ParticleLayer pl = (ParticleLayer) {
+        newParticleEmitter(demon.pos, LoadTexture("assets/lava_0.png")), 0, 0, 0
+    };
+    World world = { &map, &demon, .particles = &pl};
     EnemyShooter enemy = {
         LoadTexture("assets/beast.png"),
         (Vector2) { 200, 200 }, (Vector2) { 1, 1 }, 0
@@ -61,7 +66,7 @@ int main() {
     camera.rotation = 0;
     camera.zoom = 1;
 
-    float EXPECTED_FRAME_TIME = 1 / (float)TARGET_FPS;
+    float EXPECTED_FRAME_TIME = 1 / (float)NEUTRAL_FPS;
     int w = demon.texture.width;
     int h = demon.texture.height;
 
@@ -74,12 +79,11 @@ int main() {
         float delta = GetFrameTime() / EXPECTED_FRAME_TIME;
         if (demon.trauma > 0) demon.trauma -= 0.01;
         ClearBackground(WHITE);
-        handleInputs(&demon, camera);
+        handleInputs(&demon, camera, delta);
         updateDemon(&demon, delta);
         updateCamera(&camera, demon);
         updateEnemies(&world);
-        demon.rHand.trail.pos = demon.rHand.pos;
-        updateParticleEmitter(&demon.rHand.trail, delta);
+        updateParticleEffects(&world, delta);
 
         BeginDrawing();
         BeginMode2D(camera);
@@ -90,16 +94,16 @@ int main() {
             drawEntityScaled((Entity *)&demon, 1 + (demon.height) / 80);
             BeginTextureMode(particleTex);
                 ClearBackground(BLANK);
-                drawParticles(&demon.rHand.trail, camera);
+                drawParticleLayer(*world.particles, camera);
             EndTextureMode();
             DrawTextureRec(particleTex.texture,
                            (Rectangle){ 0, 0,
                                         particleTex.texture.width, 
                                         -particleTex.texture.height },
                            (Vector2){ 0, 0 }, WHITE);
+            DrawFPS(10, 10);
         EndMode2D();
         EndDrawing();
-        camera.rotation = 0;
     }
 
     UnloadTexture(demon.texture);

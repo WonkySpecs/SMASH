@@ -5,9 +5,8 @@
 #include "mathUtils.h"
 #include "constants.h"
 #include "drawing.h"
-#include "particles.h"
 
-void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot);
+void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot, float delta);
 void updateHands(Demon *demon, float delta); 
 
 Demon initDemon() {
@@ -21,8 +20,6 @@ Demon initDemon() {
         NEUTRAL_HAND_SPEED,
         false,
         Vector2Zero(),
-        newParticleEmitter(demonStartPos,
-                           LoadTexture("assets/lava_0.png"))
     };
     ImageFlipHorizontal(&hand);
     Hand lHand = {
@@ -51,20 +48,20 @@ void updateDemon(Demon *demon, float delta) {
     if (Vector2Length(demon->vel) > 5) {
         demon->vel = Vector2ToLength(demon->vel, 5);
     }
-    demon->pos = Vector2Add(demon->pos, demon->vel);
+    demon->pos = Vector2Add(demon->pos, Vector2Scale(demon->vel, delta));
     demon->rot = Vector2Angle(demon->targetPos, demon->pos) + 90;
     updateHands(demon, delta);
 
     bool wasInAir = demon->height > 0;
-    demon->height += demon->zVel;
+    demon->height += demon->zVel * delta;
     bool inAir = demon->height > 0;
 
     if (wasInAir && !inAir) {
-        demon->trauma += 0.5;
+        demon->trauma += 0.4;
     }
 
     if (inAir) {
-        demon->zVel -= 0.5;
+        demon->zVel -= 0.5 * delta;
     } else {
         demon->height = 0;
         demon->zVel = 0;
@@ -78,24 +75,24 @@ void updateHands(Demon *demon, float delta) {
                                     Y_OFFSET + waving * 2};
     Vector2 lHandOffset = (Vector2){X_OFFSET - waving * 3,
                                     Y_OFFSET + waving * 2};
-    moveHand(&demon->rHand, demon->pos, rHandOffset, demon->rot);
-    moveHand(&demon->lHand, demon->pos, lHandOffset, demon->rot);
+    moveHand(&demon->rHand, demon->pos, rHandOffset, demon->rot, delta);
+    moveHand(&demon->lHand, demon->pos, lHandOffset, demon->rot, delta);
 }
 
-void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot) {
+void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot, float delta) {
     Vector2 toTarget;
 
     if (!hand->flying) {
         Vector2 handOffset = Vector2Rotate(neutralOffset, DEG2RAD * rot);
         Vector2 targetPos = Vector2Add(basePos, handOffset);
-        MoveTowardsPoint(&hand->pos, targetPos, hand->speed);
+        MoveTowardsPoint(&hand->pos, targetPos, hand->speed * delta);
         float waving = sin(GetTime() * 4);
         hand->rot = rot - INITIAL_ROT_OFFSET + waving * 2;
     } else {
         hand->speed += hand->speed / 10;
         MoveTowardsPoint(&hand->pos,
                          hand->targetPos,
-                         hand->speed);
+                         hand->speed * delta);
         Vector2 toTarget = Vector2Subtract(hand->targetPos,
                                            hand->pos);
         if (Vector2Length(toTarget) < 2) {

@@ -3,7 +3,6 @@
 
 #include "raylib.h"
 #include "constants.h"
-#include "particles.h"
 
 #define BASEFIELDS struct {\
 	Texture2D texture;\
@@ -21,7 +20,6 @@ typedef struct Hand {
     float speed;
     bool flying;
     Vector2 targetPos;
-    ParticleEmitter trail;
 } Hand;
 
 typedef struct Demon {
@@ -32,6 +30,7 @@ typedef struct Demon {
     float height;
     float zVel;
     float trauma; // Not convinced this should be here
+    bool breathingFire;
 } Demon;
 
 typedef enum EnemyType {
@@ -59,10 +58,34 @@ typedef struct Map {
     Tile tiles[MAP_WIDTH][MAP_HEIGHT];
 } Map;
 
+typedef struct Particle {
+    Vector2 pos, vel;
+    float age, lifetime;
+} Particle;
+
+typedef struct ParticleEmitter {
+    Particle *particles;
+    int numParticles;
+    Texture2D texture;
+    bool active;
+    Vector2 pos;
+    float emissionRate;
+    float sinceEmission;
+    float facing; // rad
+    float emitArc; // rad
+} ParticleEmitter;
+
+typedef struct ParticleLayer {
+    ParticleEmitter fireBreath;
+    ParticleEmitter lHand;
+    ParticleEmitter rHand;
+    ParticleEmitter *dynamicEffects;
+} ParticleLayer;
+
 typedef struct World {
     Map *map;
     Demon *demon;
     Enemy *enemies[MAX_ENEMIES];
+    ParticleLayer *particles;
 } World;
-
 #endif
