@@ -1,4 +1,3 @@
-#include "utils.h"
 #include "raymath.h"
 #include "drawing.h"
 #include "constants.h"

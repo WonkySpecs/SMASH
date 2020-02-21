@@ -1,4 +1,5 @@
 #include "mathUtils.h"
+#include <stdlib.h>
 
 Vector2 Vector2ToLength(Vector2 vec, float len) {
     return Vector2Scale(vec, len / Vector2Length(vec));
@@ -23,4 +24,12 @@ void MoveTowardsPoint(Vector2 *vec, Vector2 target, float maxSpeed) {
     float speed = fmin(maxSpeed, Vector2Length(toTarget));
     *vec = Vector2Add(*vec,
                       Vector2ToLength(toTarget, speed));
+}
+
+float randFloat() {
+    return (double)rand() / (double)RAND_MAX;
+}
+
+float randFloatBetween(float minInclusive, float maxInclusive) {
+    return randFloat() * (maxInclusive - minInclusive) + minInclusive;
 }
