@@ -13,6 +13,14 @@
 const int TARGET_FPS = 120;
 const int NEUTRAL_FPS = 60;
 
+void setHandFlying(Hand *hand, Vector2 target) {
+        hand->flying = true;
+        hand->targetPos = target;
+        hand->speed = 3;
+        hand->rot = Vector2Angle(hand->pos,
+                                 hand->targetPos) - 90;
+}
+
 void handleInputs(Demon *demon, Camera2D camera, float delta) {
     float accel = 3.5 * delta;
     if (demon->height == 0) {
@@ -26,22 +34,14 @@ void handleInputs(Demon *demon, Camera2D camera, float delta) {
     demon->targetPos = GetScreenToWorld2D(GetMousePosition(), camera);
 
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !demon->lHand.flying) {
-        demon->lHand.flying = true;
-        demon->lHand.targetPos = GetScreenToWorld2D(GetMousePosition(), camera);
-        demon->lHand.speed = 3;
-        demon->lHand.rot = Vector2Angle(demon->lHand.pos,
-                                        demon->lHand.targetPos) - 90;
+        setHandFlying(&demon->lHand, GetScreenToWorld2D(GetMousePosition(), camera));
     }
     // Third condition works around a problem (bug?) where all buttons are 
     // 'pressed' when lift click is held.
     if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)
         && !demon->rHand.flying
         && !IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        demon->rHand.flying = true;
-        demon->rHand.targetPos = GetScreenToWorld2D(GetMousePosition(), camera);
-        demon->rHand.speed = 3;
-        demon->rHand.rot = Vector2Angle(demon->rHand.pos,
-                                        demon->rHand.targetPos) - 90;
+        setHandFlying(&demon->rHand, GetScreenToWorld2D(GetMousePosition(), camera));
     }
 }
 
