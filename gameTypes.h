@@ -66,6 +66,7 @@ typedef struct Particle {
 typedef struct ParticleEmitter {
     Particle *particles;
     int numParticles;
+    int lastReplaced;
     Texture2D texture;
     bool active;
     Vector2 pos;
