@@ -33,11 +33,14 @@ Map initMap() {
     return map;
 }
 
-void drawMap(Map map) {
+void drawMap(Map map, Camera2D camera) {
     for(int x = 0; x < MAP_WIDTH; x++) {
         for(int y = 0; y < MAP_HEIGHT; y++) {
             Texture tex = map.tiles[x][y].texture;
-            DrawTexture(tex, x * tex.width, y * tex.height, WHITE);
+            Vector2 screenPos = GetWorldToScreen2D(
+                (Vector2){x * tex.width, y * tex.height},
+                camera);
+            DrawTextureV(tex, screenPos,  WHITE);
         }
     }
 }

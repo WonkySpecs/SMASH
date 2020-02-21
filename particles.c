@@ -15,7 +15,7 @@ void drawParticles(ParticleEmitter *emitter, Camera2D camera) {
         Color c = (Color){255, g, g / 3, 255};
         if (p.age >= p.lifetime) continue;
         Vector2 pos = GetWorldToScreen2D((Vector2){emitter->pos.x + p.pos.x,
-                                emitter->pos.y + p.pos.y},
+                                                   emitter->pos.y + p.pos.y},
                                 camera);
         float size = 1 - p.age / p.lifetime;
         DrawRectanglePro((Rectangle){pos.x, pos.y, 8 * size, 8 * size},

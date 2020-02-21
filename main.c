@@ -87,20 +87,20 @@ int main() {
 
         BeginDrawing();
         BeginMode2D(camera);
-            drawMap(map);
-            drawEnemies(&world);
-            drawEntity((Entity *)(&demon.rHand));
-            drawEntity((Entity *)(&demon.lHand));
-            drawEntityScaled((Entity *)&demon, 1 + (demon.height) / 80);
             BeginTextureMode(particleTex);
                 ClearBackground(BLANK);
                 drawParticleLayer(*world.particles, camera);
             EndTextureMode();
+            drawMap(map, camera);
+            drawEnemies(&world, camera);
+            drawEntity((Entity *)(&demon.rHand), camera);
+            drawEntity((Entity *)(&demon.lHand), camera);
             DrawTextureRec(particleTex.texture,
                            (Rectangle){ 0, 0,
                                         particleTex.texture.width, 
                                         -particleTex.texture.height },
                            (Vector2){ 0, 0 }, WHITE);
+            drawEntityScaled((Entity *)&demon, 1 + (demon.height) / 80, camera);
             DrawFPS(10, 10);
         EndMode2D();
         EndDrawing();

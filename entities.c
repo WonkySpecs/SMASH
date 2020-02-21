@@ -120,11 +120,11 @@ void updateEnemies(World *world) {
     }
 }
 
-void drawEnemies(World *world) {
+void drawEnemies(World *world, Camera2D camera) {
     for (int i = 0; i < MAX_ENEMIES; i ++) {
         Enemy *e = world->enemies[i];
         if (e != 0) {
-            drawEntity((Entity *)e);
+            drawEntity((Entity *)e, camera);
         }
     }
 }

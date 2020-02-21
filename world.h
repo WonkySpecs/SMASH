@@ -4,5 +4,5 @@
 #include "gameTypes.h"
 
 Map initMap();
-void drawMap(Map map);
+void drawMap(Map map, Camera2D camera);
 #endif

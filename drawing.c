@@ -5,20 +5,21 @@
 
 Vector2 lastCameraTarget = {9999, 0};
 
-void drawEntityScaled(Entity *e, float scale) {
+void drawEntityScaled(Entity *e, float scale, Camera2D camera) {
     Texture tex = e->texture;
     float w = tex.width;
     float h = tex.height;
+    Vector2 screenPos = GetWorldToScreen2D(e->pos, camera);
     DrawTexturePro(tex,
                    (Rectangle){0, 0, w, h},
-                   (Rectangle){e->pos.x, e->pos.y, w * scale, h * scale},
+                   (Rectangle){screenPos.x, screenPos.y, w * scale, h * scale},
                    (Vector2){(w / 2) * scale, (h / 2) * scale},
                    e->rot,
                    WHITE);
 }
 
-void drawEntity(Entity *e) {
-    drawEntityScaled(e, 1.0);
+void drawEntity(Entity *e, Camera2D camera) {
+    drawEntityScaled(e, 1.0, camera);
 }
 
 void updateCamera(Camera2D *camera, Demon demon) {
