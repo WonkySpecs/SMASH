@@ -23,11 +23,8 @@ Map initMap() {
 
     for(int x = 0; x < MAP_WIDTH; x++) {
         for(int y = 0; y < MAP_HEIGHT; y++) {
-            if (isLava(x, y)) {
-                map.tiles[x][y] = (Tile){lavaTex};
-            } else {
-                map.tiles[x][y] = (Tile){stoneTextures[GetRandomValue(0, 7)]};
-            }
+            Texture tex = isLava(x, y) ? lavaTex : stoneTextures[GetRandomValue(0, 7)];
+            map.tiles[x][y] = (Tile){tex};
         }
     }
     return map;

@@ -29,9 +29,9 @@ void updateCamera(Camera2D *camera, Demon demon) {
         camera->target = Vector2Lerp(lastCameraTarget, demon.pos, 0.08);
     }
     lastCameraTarget = camera->target;
-    float baseOffset = 30 * demon.trauma * demon.trauma;
+    float baseOffset = 40 * demon.trauma * demon.trauma;
     camera->offset = Vector2Add((Vector2){W_WIDTH / 2, W_HEIGHT / 2},
-                                (Vector2){baseOffset * randFloat(),
-                                          baseOffset * randFloat()});
+                                (Vector2){baseOffset * (randFloat() * 2 - 1),
+                                          baseOffset * (randFloat() * 2 - 1)});
     camera->rotation = 5 * demon.trauma * demon.trauma * (randFloat() - 0.5);
 }
