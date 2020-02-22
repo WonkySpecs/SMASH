@@ -56,6 +56,8 @@ typedef struct Tile {
 
 typedef struct Map {
     Tile tiles[MAP_WIDTH][MAP_HEIGHT];
+    Rectangle *obstacles;
+    int numObstacles;
 } Map;
 
 typedef struct Particle {

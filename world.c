@@ -27,6 +27,15 @@ Map initMap() {
             map.tiles[x][y] = (Tile){tex};
         }
     }
+    const int numObstacles = 4;
+    const int w = MAP_WIDTH * 32;
+    const int h = MAP_HEIGHT * 32;
+    map.obstacles = (Rectangle *)malloc(numObstacles * sizeof(Rectangle));
+    map.obstacles[0] = (Rectangle) {0, 0, w, 10};
+    map.obstacles[1] = (Rectangle) {0, 0, 10, h};
+    map.obstacles[2] = (Rectangle) {0, h, MAP_WIDTH * 32 + 9, 10};
+    map.obstacles[3] = (Rectangle) {w, 0, 10, h};
+    map.numObstacles = numObstacles;
     return map;
 }
 

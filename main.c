@@ -77,7 +77,7 @@ int main() {
         if (demon.trauma > 0) demon.trauma -= 0.01;
         ClearBackground(WHITE);
         handleInputs(&demon, camera, delta);
-        updateDemon(&demon, delta);
+        updateDemon(&world, delta);
         updateCamera(&camera, demon);
         updateEnemies(&world);
         updateParticleEffects(&world, delta);
@@ -100,6 +100,11 @@ int main() {
             drawEntityScaled((Entity *)&demon, 1 + (demon.height) / 80, camera);
             DrawFPS(10, 10);
 
+        for (int i = 0; i < world.map->numObstacles; i++) {
+            Rectangle obst = world.map->obstacles[i];
+            Vector2 pos = GetWorldToScreen2D((Vector2){obst.x, obst.y}, camera);
+            DrawRectangle(pos.x, pos.y, obst.width, obst.height, PINK);
+        }
         EndMode2D();
         EndDrawing();
     }

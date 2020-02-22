@@ -43,12 +43,17 @@ Demon initDemon() {
     };
 }
 
-void updateDemon(Demon *demon, float delta) {
+void updateDemon(World *world, float delta) {
+    Demon *demon = world->demon;
     if (demon->height == 0) demon->vel = Vector2Scale(demon->vel, 0.75);
     if (Vector2Length(demon->vel) > 5) {
         demon->vel = Vector2ToLength(demon->vel, 5);
     }
     Vector2 v = Vector2Scale(demon->vel, delta);
+    Circle hb = (Circle){demon->pos, 20};
+    for (int i = 0; i < world->map->numObstacles; i++) {
+        v = moveWithoutHitting(hb, v, world->map->obstacles[i]);
+    }
     demon->pos = Vector2Add(demon->pos, v);
     demon->rot = Vector2Angle(demon->targetPos, demon->pos) + 90;
     updateHands(demon, delta);
