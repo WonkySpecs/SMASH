@@ -2,6 +2,7 @@
 #define __ENTITIES
 
 #include "gameTypes.h"
+#include "raylib.h"
 
 Demon initDemon();
 void updateDemon(Demon *demon, float delta);

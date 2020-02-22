@@ -71,9 +71,6 @@ int main() {
     int h = demon.texture.height;
 
     RenderTexture2D particleTex = LoadRenderTexture(W_WIDTH, W_HEIGHT);
-    BeginTextureMode(particleTex);
-    ClearBackground(WHITE);
-    EndTextureMode();
 
     while (!WindowShouldClose()) {
         float delta = GetFrameTime() / EXPECTED_FRAME_TIME;
@@ -102,6 +99,7 @@ int main() {
                            (Vector2){ 0, 0 }, WHITE);
             drawEntityScaled((Entity *)&demon, 1 + (demon.height) / 80, camera);
             DrawFPS(10, 10);
+
         EndMode2D();
         EndDrawing();
     }

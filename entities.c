@@ -48,7 +48,8 @@ void updateDemon(Demon *demon, float delta) {
     if (Vector2Length(demon->vel) > 5) {
         demon->vel = Vector2ToLength(demon->vel, 5);
     }
-    demon->pos = Vector2Add(demon->pos, Vector2Scale(demon->vel, delta));
+    Vector2 v = Vector2Scale(demon->vel, delta);
+    demon->pos = Vector2Add(demon->pos, v);
     demon->rot = Vector2Angle(demon->targetPos, demon->pos) + 90;
     updateHands(demon, delta);
 
@@ -85,12 +86,12 @@ void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot, flo
     if (!hand->flying) {
         Vector2 handOffset = Vector2Rotate(neutralOffset, DEG2RAD * rot);
         Vector2 targetPos = Vector2Add(basePos, handOffset);
-        MoveTowardsPoint(&hand->pos, targetPos, hand->speed * delta);
+        moveTowardsPoint(&hand->pos, targetPos, hand->speed * delta);
         float waving = sin(GetTime() * 4);
         hand->rot = rot - INITIAL_ROT_OFFSET + waving * 2;
     } else {
         hand->speed += hand->speed / 10;
-        MoveTowardsPoint(&hand->pos,
+        moveTowardsPoint(&hand->pos,
                          hand->targetPos,
                          hand->speed * delta);
         Vector2 toTarget = Vector2Subtract(hand->targetPos,
