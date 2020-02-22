@@ -29,4 +29,5 @@ Vector2 rectClosestPoint(Rectangle rect, Vector2 point);
 bool rectCircleColliding(Rectangle rect, Circle circle);
 bool circlesColliding(Circle c1, Circle c2);
 Vector2 moveWithoutHitting(Circle mover, Vector2 vel, Rectangle obstacle);
+Vector2 rectPos(Rectangle rect);
 #endif

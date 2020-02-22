@@ -9,6 +9,9 @@
 void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot, float delta);
 void updateHands(Demon *demon, float delta); 
 
+const float HAND_X_OFFSET = 65;
+const float HAND_Y_OFFSET = 15;
+
 Demon initDemon() {
     Vector2 demonStartPos = (Vector2){W_WIDTH / 2, W_HEIGHT / 2};
     Image hand = LoadImage("assets/demon_hand.png");
@@ -73,14 +76,15 @@ void updateDemon(World *world, float delta) {
         demon->zVel = 0;
     }
     if (demon->trauma > 1) demon->trauma = 1;
+    if (demon->trauma > 0) demon->trauma -= 0.01;
 }
 
 void updateHands(Demon *demon, float delta) {
     float waving = sin(GetTime() * 4);
-    Vector2 rHandOffset = (Vector2){-X_OFFSET + waving * 3,
-                                    Y_OFFSET + waving * 2};
-    Vector2 lHandOffset = (Vector2){X_OFFSET - waving * 3,
-                                    Y_OFFSET + waving * 2};
+    Vector2 rHandOffset = (Vector2){-HAND_X_OFFSET + waving * 3,
+                                    HAND_Y_OFFSET + waving * 2};
+    Vector2 lHandOffset = (Vector2){HAND_X_OFFSET - waving * 3,
+                                    HAND_Y_OFFSET + waving * 2};
     moveHand(&demon->rHand, demon->pos, rHandOffset, demon->rot, delta);
     moveHand(&demon->lHand, demon->pos, lHandOffset, demon->rot, delta);
 }
@@ -106,6 +110,14 @@ void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot, flo
             hand->speed = NEUTRAL_HAND_SPEED;
         }
     }
+}
+
+void setHandFlying(Hand *hand, Vector2 target) {
+    hand->flying = true;
+    hand->targetPos = target;
+    hand->speed = 3;
+    hand->rot = Vector2Angle(hand->pos,
+                             hand->targetPos) - 90;
 }
 
 void updateImp(EnemyShooter *enemy, World *world) {

@@ -5,6 +5,7 @@
 #include "raylib.h"
 
 Demon initDemon();
+void setHandFlying(Hand *hand, Vector2 target);
 void updateDemon(World *world, float delta);
 void updateEnemies(World *world);
 void drawEnemies(World *world, Camera2D camera);

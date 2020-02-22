@@ -3,7 +3,18 @@
 #include "constants.h"
 #include "mathUtils.h"
 
-Vector2 lastCameraTarget = {9999, 0};
+Vector2 lastCameraTarget;
+
+Camera2D initCamera(Vector2 target) {
+    Camera2D camera;
+    camera.target = target;
+    camera.offset = (Vector2){W_WIDTH / 2, W_HEIGHT / 2};
+    camera.rotation = 0;
+    camera.zoom = 1;
+
+    lastCameraTarget = target;
+    return camera;
+}
 
 void drawEntityScaled(Entity *e, float scale, Camera2D camera) {
     Texture tex = e->texture;
@@ -23,11 +34,7 @@ void drawEntity(Entity *e, Camera2D camera) {
 }
 
 void updateCamera(Camera2D *camera, Demon demon) {
-    if (lastCameraTarget.x == 9999) {
-        camera->target = demon.pos;
-    } else {
-        camera->target = Vector2Lerp(lastCameraTarget, demon.pos, 0.08);
-    }
+    camera->target = Vector2Lerp(lastCameraTarget, demon.pos, 0.08);
     lastCameraTarget = camera->target;
     float baseOffset = 40 * demon.trauma * demon.trauma;
     camera->offset = Vector2Add((Vector2){W_WIDTH / 2, W_HEIGHT / 2},

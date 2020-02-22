@@ -63,3 +63,7 @@ Vector2 moveWithoutHitting(Circle mover, Vector2 vel, Rectangle obstacle) {
                                       (mover.r - closestLen) / closestLen);
     return Vector2Add(vel, correction);
 }
+
+Vector2 rectPos(Rectangle rect) {
+    return (Vector2){rect.x, rect.y};
+}
