@@ -12,6 +12,7 @@
 
 const int TARGET_FPS = 120;
 const int NEUTRAL_FPS = 60;
+bool DEBUG = false;
 
 void setHandFlying(Hand *hand, Vector2 target) {
         hand->flying = true;
@@ -29,6 +30,7 @@ void handleInputs(Demon *demon, Camera2D camera, float delta) {
         if (IsKeyDown(KEY_W)) demon->vel.y -= accel;
         if (IsKeyDown(KEY_S)) demon->vel.y += accel;
         if (IsKeyDown(KEY_SPACE)) demon->zVel = 8;
+        if (IsKeyPressed(KEY_GRAVE)) DEBUG = !DEBUG;
         demon->breathingFire = IsKeyDown(KEY_E);
     }
     demon->targetPos = GetScreenToWorld2D(GetMousePosition(), camera);
@@ -75,7 +77,7 @@ int main() {
     while (!WindowShouldClose()) {
         float delta = GetFrameTime() / EXPECTED_FRAME_TIME;
         if (demon.trauma > 0) demon.trauma -= 0.01;
-        ClearBackground(WHITE);
+        ClearBackground(BLACK);
         handleInputs(&demon, camera, delta);
         updateDemon(&world, delta);
         updateCamera(&camera, demon);
@@ -98,12 +100,15 @@ int main() {
                                         -particleTex.texture.height },
                            (Vector2){ 0, 0 }, WHITE);
             drawEntityScaled((Entity *)&demon, 1 + (demon.height) / 80, camera);
-            DrawFPS(10, 10);
 
-        for (int i = 0; i < world.map->numObstacles; i++) {
-            Rectangle obst = world.map->obstacles[i];
-            Vector2 pos = GetWorldToScreen2D((Vector2){obst.x, obst.y}, camera);
-            DrawRectangle(pos.x, pos.y, obst.width, obst.height, PINK);
+        if (DEBUG) {
+            DrawFPS(10, 10);
+            for (int i = 0; i < world.map->numObstacles; i++) {
+                Rectangle obst = world.map->obstacles[i];
+                Vector2 pos = GetWorldToScreen2D((Vector2){obst.x, obst.y}, camera);
+                DrawRectangle(pos.x, pos.y, obst.width, obst.height, PINK);
+            }
+            DrawCircleV(GetWorldToScreen2D(demon.pos, camera), 20, GREEN);
         }
         EndMode2D();
         EndDrawing();
