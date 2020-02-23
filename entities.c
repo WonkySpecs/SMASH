@@ -90,8 +90,6 @@ void updateHands(Demon *demon, float delta) {
 }
 
 void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot, float delta) {
-    Vector2 toTarget;
-
     if (!hand->flying) {
         Vector2 handOffset = Vector2Rotate(neutralOffset, DEG2RAD * rot);
         Vector2 targetPos = Vector2Add(basePos, handOffset);
@@ -109,6 +107,10 @@ void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot, flo
             hand->flying = false;
             hand->speed = NEUTRAL_HAND_SPEED;
         }
+    }
+    if (isnan(hand->pos.x) || isnan(hand->pos.y)) {
+        printf("Correcting that nan bug\n");
+        hand->pos = basePos;
     }
 }
 
