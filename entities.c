@@ -120,7 +120,7 @@ void setHandFlying(Hand *hand, Vector2 target) {
                              hand->targetPos) - 90;
 }
 
-void updateImp(EnemyShooter *enemy, World *world) {
+void updateImp(Enemy *enemy, World *world) {
     enemy->pos = Vector2Add(enemy->pos, enemy->vel);
     enemy->rot = Vector2Angle(enemy->pos, world->demon->pos) - 90;
 }
@@ -129,11 +129,7 @@ void updateEnemies(World *world) {
     for (int i = 0; i < MAX_ENEMIES; i ++) {
         Enemy *e = world->enemies[i];
         if (e != 0) {
-            switch (e->type) {
-                case ENEMY_IMP:
-                    updateImp((EnemyShooter *)e, world);
-                    break;
-            }
+            e->update(e, world);
         }
     }
 }

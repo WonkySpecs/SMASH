@@ -48,9 +48,10 @@ int main() {
     ParticleLayer pl = (ParticleLayer) {
         newParticleEmitter(demon.pos, LoadTexture("assets/lava_0.png")), 0, 0, 0
     };
-    EnemyShooter enemy = {
-        LoadTexture("assets/beast.png"),
-        (Vector2) { 200, 200 }, (Vector2) { 1, 1 }, 0
+    Enemy enemy = {
+        .texture = LoadTexture("assets/beast.png"),
+        .pos = (Vector2){200, 200}, .vel = (Vector2){1, 1}, .rot = 0,
+        .update = &updateImp, .fireDelay = 10, .sinceFired = 0
     };
 
     World world = { &map, &demon, {&enemy}, .particles = &pl};

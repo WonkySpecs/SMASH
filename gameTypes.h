@@ -33,22 +33,15 @@ typedef struct Demon {
     bool breathingFire;
 } Demon;
 
-typedef enum EnemyType {
-    ENEMY_IMP,
-} EnemyType;
-
-
-typedef struct Enemy {
+typedef struct Enemy Enemy;
+typedef struct World World;
+struct Enemy {
     BASEFIELDS;
-    EnemyType type;
-} Enemy;
-
-typedef struct EnemyShooter {
-    BASEFIELDS;
-    EnemyType type;
+    void (*update)(Enemy*, World*);
     float fireDelay;
     float sinceFired;
-} EnemyShooter;
+};
+
 
 typedef struct Tile {
     Texture2D texture;
