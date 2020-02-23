@@ -55,7 +55,8 @@ typedef struct Tile {
 } Tile;
 
 typedef struct Map {
-    Tile tiles[MAP_WIDTH][MAP_HEIGHT];
+    Texture2D tileTex;
+    Vector2 tiles[MAP_WIDTH][MAP_HEIGHT];
     Rectangle *obstacles;
     int numObstacles;
 } Map;

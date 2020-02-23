@@ -1,6 +1,6 @@
 #include "world.h"
 #include <stdlib.h>
-#include <stdio.h>
+#include "tiles.h"
 
 bool isLava(int x, int y) {
     int c = x * x + y * y;
@@ -8,32 +8,21 @@ bool isLava(int x, int y) {
 }
 
 Map initMap() {
-    Map map;
-    Texture2D lavaTex = LoadTexture("assets/lava_0.png");
-    Texture2D stoneTextures[8];
-    for (int i = 0; i < 8; i++) {
-        char *texName = (char *)malloc(50 * sizeof(char));
-        sprintf(texName,
-                "assets/tomb_%d_%s.png",
-                i % 4,
-                i > 4 ? "old" : "new");
-        stoneTextures[i] = LoadTexture(texName);
-        free(texName);
-    }
+    Map map = {loadTiles()};
 
     for(int x = 0; x < MAP_WIDTH; x++) {
         for(int y = 0; y < MAP_HEIGHT; y++) {
-            Texture tex = isLava(x, y) ? lavaTex : stoneTextures[GetRandomValue(0, 7)];
-            map.tiles[x][y] = (Tile){tex};
+            TileCategory cat = isLava(x, y) ? LAVA : GROUND;
+            map.tiles[x][y] = tileOffsets[randomTile(cat)];
         }
     }
     const int numObstacles = 4;
-    const int w = MAP_WIDTH * 32;
-    const int h = MAP_HEIGHT * 32;
+    const int w = MAP_WIDTH * TILE_SIZE;
+    const int h = MAP_HEIGHT * TILE_SIZE;
     map.obstacles = (Rectangle *)malloc(numObstacles * sizeof(Rectangle));
     map.obstacles[0] = (Rectangle) {0, 0, w, 10};
     map.obstacles[1] = (Rectangle) {0, 0, 10, h};
-    map.obstacles[2] = (Rectangle) {0, h, MAP_WIDTH * 32 + 9, 10};
+    map.obstacles[2] = (Rectangle) {0, h, MAP_WIDTH * TILE_SIZE + 9, 10};
     map.obstacles[3] = (Rectangle) {w, 0, 10, h};
     map.numObstacles = numObstacles;
     return map;
@@ -42,11 +31,19 @@ Map initMap() {
 void drawMap(Map map, Camera2D camera) {
     for(int x = 0; x < MAP_WIDTH; x++) {
         for(int y = 0; y < MAP_HEIGHT; y++) {
-            Texture tex = map.tiles[x][y].texture;
             Vector2 screenPos = GetWorldToScreen2D(
-                (Vector2){x * tex.width, y * tex.height},
+                (Vector2){x * TILE_SIZE, y * TILE_SIZE},
                 camera);
-            DrawTextureV(tex, screenPos,  WHITE);
+            Rectangle dest = (Rectangle) {
+                screenPos.x, screenPos.y,
+                map.tileTex.width * tilePercentSize.x,
+                map.tileTex.height * tilePercentSize.y
+            };
+            DrawTextureQuad(map.tileTex,
+                            tilePercentSize,
+                            map.tiles[x][y],
+                            dest,
+                            WHITE);
         }
     }
 }

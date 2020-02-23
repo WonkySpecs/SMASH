@@ -7,4 +7,5 @@
 #define MAP_WIDTH 50
 #define MAP_HEIGHT 40
 #define MAX_ENEMIES 20
+#define TILE_SIZE 32
 #endif
