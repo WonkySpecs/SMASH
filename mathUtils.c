@@ -44,17 +44,17 @@ Vector2 rectClosestPoint(Rectangle rect, Vector2 point) {
 
 bool rectCircleColliding(Rectangle rect, Circle circle) {
     Vector2 closest = rectClosestPoint(rect, circle.c);
-    return Vector2Length(Vector2Subtract(closest, circle.c)) <= circle.r;
+    return Vector2Distance(closest, circle.c) <= circle.r;
 }
 
 bool circlesColliding(Circle c1, Circle c2) {
-    return Vector2Length(Vector2Subtract(c1.c, c2.c)) < c1.r + c2.r;
+    return Vector2Distance(c1.c, c2.c) < c1.r + c2.r;
 }
 
 Vector2 moveWithoutHitting(Circle mover, Vector2 vel, Rectangle obstacle) {
     Vector2 targetPos = Vector2Add(mover.c, vel);
     Vector2 closestPoint = rectClosestPoint(obstacle, targetPos);
-    float closestLen = Vector2Length(Vector2Subtract(targetPos, closestPoint));
+    float closestLen = Vector2Distance(targetPos, closestPoint);
     if (closestLen >= mover.r) {
         return vel;
     }

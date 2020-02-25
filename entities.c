@@ -97,7 +97,7 @@ void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot, flo
             Vector2 handOffset = Vector2Rotate(neutralOffset, DEG2RAD * rot);
             Vector2 targetPos = Vector2Add(basePos, handOffset);
             moveTowardsPoint(&hand->pos, targetPos, hand->speed * delta);
-            if (Vector2Length(Vector2Subtract(hand->pos, targetPos)) < 50) {
+            if (Vector2Distance(hand->pos, targetPos) < 50) {
                 hand->state = NEUTRAL;
             }
             float waving = sin(GetTime() * 4);
@@ -109,9 +109,7 @@ void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot, flo
             moveTowardsPoint(&hand->pos,
                              hand->targetPos,
                              hand->speed * delta);
-            Vector2 toTarget = Vector2Subtract(hand->targetPos,
-                                               hand->pos);
-            if (Vector2Length(toTarget) < 2) {
+            if (Vector2Distance(hand->targetPos, hand->pos) < 2) {
                 hand->state = RECOVERING;
                 hand->speed = NEUTRAL_HAND_SPEED;
             }

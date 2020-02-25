@@ -9,7 +9,7 @@
 void drawParticles(ParticleEmitter *emitter, Camera2D camera) {
     for (int i = 0; i < emitter->numParticles; i++) {
         Particle p = emitter->particles[i];
-        float g = fmax(0, 255 - Vector2Length(Vector2Subtract(emitter->pos, p.pos)));
+        float g = fmax(0, 255 - Vector2Distance(emitter->pos, p.pos));
         Color c = (Color){255, g, g / 3, 255};
         if (p.age >= p.lifetime) continue;
         Vector2 pos = GetWorldToScreen2D(p.pos, camera);
