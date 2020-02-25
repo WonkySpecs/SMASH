@@ -11,6 +11,9 @@
 	float rot;\
 }
 
+typedef struct World World;
+
+// ### Entities ###
 typedef struct Entity {
     BASEFIELDS;
 } Entity;
@@ -34,7 +37,6 @@ typedef struct Demon {
 } Demon;
 
 typedef struct Enemy Enemy;
-typedef struct World World;
 struct Enemy {
     BASEFIELDS;
     void (*update)(Enemy*, World*);
@@ -42,7 +44,9 @@ struct Enemy {
     float sinceFired;
 };
 
+// #############
 
+// ### Map ###
 typedef struct Tile {
     Texture2D texture;
 } Tile;
@@ -54,6 +58,9 @@ typedef struct Map {
     int numObstacles;
 } Map;
 
+// #############
+
+// ### Particles ###
 typedef struct Particle {
     Vector2 pos, vel;
     float age, lifetime;
@@ -78,6 +85,7 @@ typedef struct ParticleLayer {
     ParticleEmitter rHand;
     ParticleEmitter *dynamicEffects;
 } ParticleLayer;
+// #############
 
 typedef struct World {
     Map *map;
