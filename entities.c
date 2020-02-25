@@ -16,22 +16,23 @@ Demon initDemon() {
     Vector2 demonStartPos = (Vector2){W_WIDTH / 2, W_HEIGHT / 2};
     Image hand = LoadImage("assets/demon_hand.png");
     Hand rHand = {
-        LoadTextureFromImage(hand),
-        demonStartPos,
-        Vector2Zero(),
-        0,
-        NEUTRAL_HAND_SPEED,
-        false,
-        Vector2Zero(),
+        .texture = LoadTextureFromImage(hand),
+        .pos = demonStartPos,
+        .vel = Vector2Zero(),
+        .rot = 0,
+        .speed = NEUTRAL_HAND_SPEED,
+        .targetPos = Vector2Zero(),
+        .state = NEUTRAL,
     };
     ImageFlipHorizontal(&hand);
     Hand lHand = {
-        LoadTextureFromImage(hand),
-        demonStartPos,
-        Vector2Zero(),
-        0,
-        NEUTRAL_HAND_SPEED,
-        false,
+        .texture = LoadTextureFromImage(hand),
+        .pos = demonStartPos,
+        .vel = Vector2Zero(),
+        .rot = 0,
+        .speed = NEUTRAL_HAND_SPEED,
+        .targetPos = Vector2Zero(),
+        .state = NEUTRAL,
     };
     UnloadImage(hand);
 
@@ -90,24 +91,34 @@ void updateHands(Demon *demon, float delta) {
 }
 
 void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot, float delta) {
-    if (!hand->flying) {
-        Vector2 handOffset = Vector2Rotate(neutralOffset, DEG2RAD * rot);
-        Vector2 targetPos = Vector2Add(basePos, handOffset);
-        moveTowardsPoint(&hand->pos, targetPos, hand->speed * delta);
-        float waving = sin(GetTime() * 4);
-        hand->rot = rot - INITIAL_ROT_OFFSET + waving * 2;
-    } else {
-        hand->speed += hand->speed / 10;
-        moveTowardsPoint(&hand->pos,
-                         hand->targetPos,
-                         hand->speed * delta);
-        Vector2 toTarget = Vector2Subtract(hand->targetPos,
-                                           hand->pos);
-        if (Vector2Length(toTarget) < 2) {
-            hand->flying = false;
-            hand->speed = NEUTRAL_HAND_SPEED;
+    switch (hand->state) {
+        case NEUTRAL:
+        case RECOVERING: {
+            Vector2 handOffset = Vector2Rotate(neutralOffset, DEG2RAD * rot);
+            Vector2 targetPos = Vector2Add(basePos, handOffset);
+            moveTowardsPoint(&hand->pos, targetPos, hand->speed * delta);
+            if (Vector2Length(Vector2Subtract(hand->pos, targetPos)) < 50) {
+                hand->state = NEUTRAL;
+            }
+            float waving = sin(GetTime() * 4);
+            hand->rot = rot - INITIAL_ROT_OFFSET + waving * 2;
+            break;
+        }
+        case ATTACKING: {
+            hand->speed += hand->speed / 10;
+            moveTowardsPoint(&hand->pos,
+                             hand->targetPos,
+                             hand->speed * delta);
+            Vector2 toTarget = Vector2Subtract(hand->targetPos,
+                                               hand->pos);
+            if (Vector2Length(toTarget) < 2) {
+                hand->state = RECOVERING;
+                hand->speed = NEUTRAL_HAND_SPEED;
+            }
+            break;
         }
     }
+
     if (isnan(hand->pos.x) || isnan(hand->pos.y)) {
         printf("Correcting that nan bug\n");
         hand->pos = basePos;
@@ -115,7 +126,7 @@ void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot, flo
 }
 
 void setHandFlying(Hand *hand, Vector2 target) {
-    hand->flying = true;
+    hand->state = ATTACKING;
     hand->targetPos = target;
     hand->speed = 3;
     hand->rot = Vector2Angle(hand->pos,

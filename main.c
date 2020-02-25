@@ -27,13 +27,13 @@ void handleInputs(Demon *demon, Camera2D camera, float delta) {
     }
     demon->targetPos = GetScreenToWorld2D(GetMousePosition(), camera);
 
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !demon->lHand.flying) {
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && demon->lHand.state == NEUTRAL) {
         setHandFlying(&demon->lHand, GetScreenToWorld2D(GetMousePosition(), camera));
     }
     // Third condition works around a problem (bug?) where all buttons are 
     // 'pressed' when lift click is held.
     if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)
-        && !demon->rHand.flying
+        && demon->rHand.state == NEUTRAL
         && !IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         setHandFlying(&demon->rHand, GetScreenToWorld2D(GetMousePosition(), camera));
     }
@@ -51,7 +51,8 @@ int main() {
     Enemy enemy = {
         .texture = LoadTexture("assets/beast.png"),
         .pos = (Vector2){200, 200}, .vel = (Vector2){1, 1}, .rot = 0,
-        .update = &updateImp, .fireDelay = 10, .sinceFired = 0
+        .update = &updateImp, .fireDelay = 10, .sinceFired = 0,
+        .state = NEUTRAL
     };
 
     World world = { &map, &demon, {&enemy}, .particles = &pl};

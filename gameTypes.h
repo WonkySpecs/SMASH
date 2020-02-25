@@ -14,6 +14,10 @@
 typedef struct World World;
 
 // ### Entities ###
+typedef enum EntityState {
+    NEUTRAL, PREPARING, ATTACKING, RECOVERING,
+} EntityState;
+
 typedef struct Entity {
     BASEFIELDS;
 } Entity;
@@ -21,8 +25,8 @@ typedef struct Entity {
 typedef struct Hand {
     BASEFIELDS;
     float speed;
-    bool flying;
     Vector2 targetPos;
+    EntityState state;
 } Hand;
 
 typedef struct Demon {
@@ -42,6 +46,7 @@ struct Enemy {
     void (*update)(Enemy*, World*);
     float fireDelay;
     float sinceFired;
+    EntityState state;
 };
 
 // #############
