@@ -43,9 +43,9 @@ typedef struct Demon {
 typedef struct Enemy Enemy;
 struct Enemy {
     BASEFIELDS;
-    void (*update)(Enemy*, World*);
-    float fireDelay;
-    float sinceFired;
+    void (*update)(Enemy*, World*, float);
+    float primTimer;
+    float primThresh;
     EntityState state;
 };
 

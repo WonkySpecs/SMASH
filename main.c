@@ -51,7 +51,7 @@ int main() {
     Enemy enemy = {
         .texture = LoadTexture("assets/beast.png"),
         .pos = (Vector2){200, 200}, .vel = (Vector2){1, 1}, .rot = 0,
-        .update = &updateImp, .fireDelay = 10, .sinceFired = 0,
+        .update = &updateImp, .primThresh = 100, .primTimer = 0,
         .state = NEUTRAL
     };
 
@@ -70,7 +70,7 @@ int main() {
         handleInputs(&demon, camera, delta);
         updateDemon(&world, delta);
         updateCamera(&camera, demon);
-        updateEnemies(&world);
+        updateEnemies(&world, delta);
         updateParticleEffects(&world, delta);
 
         BeginDrawing();

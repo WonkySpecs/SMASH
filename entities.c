@@ -131,16 +131,25 @@ void setHandFlying(Hand *hand, Vector2 target) {
                              hand->targetPos) - 90;
 }
 
-void updateImp(Enemy *enemy, World *world) {
-    enemy->pos = Vector2Add(enemy->pos, enemy->vel);
-    enemy->rot = Vector2Angle(enemy->pos, world->demon->pos) - 90;
+void updateImp(Enemy *imp, World *world, float delta) {
+    if (imp->state == NEUTRAL) {
+        imp->pos = Vector2Add(imp->pos, imp->vel);
+        imp->primTimer += delta;
+        if (imp->primTimer > imp-> primThresh) {
+            imp->state = PREPARING;
+        }
+    }
+
+    if (imp->state == NEUTRAL || imp->state == PREPARING) {
+        imp->rot = Vector2Angle(imp->pos, world->demon->pos) - 90;
+    }
 }
 
-void updateEnemies(World *world) {
+void updateEnemies(World *world, float delta) {
     for (int i = 0; i < MAX_ENEMIES; i ++) {
         Enemy *e = world->enemies[i];
         if (e != 0) {
-            e->update(e, world);
+            e->update(e, world, delta);
         }
     }
 }
