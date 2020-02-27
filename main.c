@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 #include "raylib.h"
@@ -39,6 +40,22 @@ void handleInputs(Demon *demon, Camera2D camera, float delta) {
     }
 }
 
+void initEnemies(Enemy *enemies) {
+    Texture2D tex = LoadTexture("assets/beast.png");
+    for (int i = 0; i < 10; i++) {
+        Vector2 initPos = (Vector2){randFloat() * 800 + 200, randFloat() * 500 + 200};
+        Enemy enemy = {
+            .texture = tex,
+            .pos = initPos,
+            .rot = 0, .maxSpeed = 2 + randFloat() - 0.5,
+            .targetPos = (Vector2) {0, 0}, .update = &updateImp,
+            .primThresh = 100, .primTimer = (int)(randFloat() * 100),
+            .state = NEUTRAL
+        };
+        enemies[i] = enemy;
+    }
+}
+
 int main() {
     InitWindow(W_WIDTH, W_HEIGHT, "Demon SMASH");
     SetTargetFPS(TARGET_FPS);
@@ -48,14 +65,10 @@ int main() {
     ParticleLayer pl = (ParticleLayer) {
         newParticleEmitter(demon.pos, LoadTexture("assets/lava_0.png")), 0, 0, 0
     };
-    Enemy enemy = {
-        .texture = LoadTexture("assets/beast.png"),
-        .pos = (Vector2){200, 200}, .vel = (Vector2){1, 1}, .rot = 0,
-        .update = &updateImp, .primThresh = 100, .primTimer = 0,
-        .state = NEUTRAL
-    };
+    Enemy *enemies = malloc(10 * sizeof(Enemy));
+    initEnemies(enemies);
 
-    World world = { &map, &demon, {&enemy}, .particles = &pl};
+    World world = { &map, &demon, enemies, 10, .particles = &pl};
 
     Camera2D camera = initCamera(demon.pos);
 

@@ -22,7 +22,9 @@ float Vector2Length2(Vector2 vec) {
 
 void moveTowardsPoint(Vector2 *vec, Vector2 target, float maxSpeed) {
     Vector2 toTarget = Vector2Subtract(target, *vec);
-    float speed = fmin(maxSpeed, Vector2Length(toTarget));
+    float dist = Vector2Length(toTarget);
+    if (dist < 0.1) return;
+    float speed = fmin(maxSpeed, dist);
     *vec = Vector2Add(*vec,
                       Vector2ToLength(toTarget, speed));
 }

@@ -131,23 +131,64 @@ void setHandFlying(Hand *hand, Vector2 target) {
                              hand->targetPos) - 90;
 }
 
+bool primTimeStateTransition(Enemy *enemy, float timerThresh, EntityState nextState) {
+    if (enemy->primTimer > timerThresh) {
+        enemy->state = nextState;
+        enemy->primTimer = 0;
+        return true;
+    }
+    return false;
+}
+
+Vector2 calcImpTargetPos(Vector2 curPos, Vector2 demonPos) {
+    Vector2 diff = Vector2ToLength(
+                        Vector2Rotate(Vector2Subtract(curPos,
+                                                      demonPos),
+                                      randFloat() - 0.5),
+                        400 + randFloat() * 100 - 50);
+    return (Vector2) {
+        diff.x + demonPos.x,
+        diff.y + demonPos.y
+    };
+}
+/*
+    Imp uses primTimer/primThresh as:
+        in NEUTRAL -> time since last attack / time required until next shot.
+        in PRERPARING -> time since started preparing / time to charge attack.
+        in RECOVERING -> time since attack was fired / time required to recover.
+*/
 void updateImp(Enemy *imp, World *world, float delta) {
+
+    imp->primTimer += delta;
+
     if (imp->state == NEUTRAL) {
-        imp->pos = Vector2Add(imp->pos, imp->vel);
-        imp->primTimer += delta;
-        if (imp->primTimer > imp-> primThresh) {
-            imp->state = PREPARING;
+        if (!(imp->targetPos.x)) {
+            imp->targetPos = calcImpTargetPos(imp->pos, world->demon->pos);
+        }
+        moveTowardsPoint(&imp->pos, imp->targetPos, imp->maxSpeed);
+        if (Vector2Distance(imp->pos, imp->targetPos) < 10) {
+            primTimeStateTransition(imp, imp->primThresh, PREPARING);
         }
     }
 
     if (imp->state == NEUTRAL || imp->state == PREPARING) {
         imp->rot = Vector2Angle(imp->pos, world->demon->pos) - 90;
     }
+
+    if (imp->state == PREPARING) {
+        primTimeStateTransition(imp, imp->primThresh / 2.0, RECOVERING);
+    }
+
+    if (imp->state == RECOVERING) {
+        if (primTimeStateTransition(imp, imp->primThresh / 2.0, NEUTRAL)) {
+            imp->targetPos = calcImpTargetPos(imp->pos, world->demon->pos);
+        }
+    }
 }
 
 void updateEnemies(World *world, float delta) {
-    for (int i = 0; i < MAX_ENEMIES; i ++) {
-        Enemy *e = world->enemies[i];
+    for (int i = 0; i < world->numEnemies; i ++) {
+        Enemy *e = &world->enemies[i];
         if (e != 0) {
             e->update(e, world, delta);
         }
@@ -155,8 +196,8 @@ void updateEnemies(World *world, float delta) {
 }
 
 void drawEnemies(World *world, Camera2D camera) {
-    for (int i = 0; i < MAX_ENEMIES; i ++) {
-        Enemy *e = world->enemies[i];
+    for (int i = 0; i < world->numEnemies; i ++) {
+        Enemy *e = &world->enemies[i];
         if (e != 0) {
             drawEntity((Entity *)e, camera);
         }

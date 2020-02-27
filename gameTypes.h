@@ -44,6 +44,9 @@ typedef struct Enemy Enemy;
 struct Enemy {
     BASEFIELDS;
     void (*update)(Enemy*, World*, float);
+    Vector2 targetPos;
+    float maxSpeed;
+    float accel;
     float primTimer;
     float primThresh;
     EntityState state;
@@ -95,7 +98,8 @@ typedef struct ParticleLayer {
 typedef struct World {
     Map *map;
     Demon *demon;
-    Enemy *enemies[MAX_ENEMIES];
+    Enemy *enemies;
+    int numEnemies;
     ParticleLayer *particles;
 } World;
 #endif
