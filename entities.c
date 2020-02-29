@@ -9,6 +9,7 @@
 
 void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot, float delta);
 void updateHands(Demon *demon, float delta); 
+Hitbox worldHitbox(Entity e);
 
 const float HAND_X_OFFSET = 65;
 const float HAND_Y_OFFSET = 15;
@@ -57,9 +58,10 @@ void updateDemon(World *world, float delta) {
         demon->vel = Vector2ToLength(demon->vel, 5);
     }
     Vector2 v = Vector2Scale(demon->vel, delta);
-    Circle hb = (Circle){demon->pos, 20};
     for (int i = 0; i < world->map->numObstacles; i++) {
-        v = moveWithoutHitting(hb, v, world->map->obstacles[i]);
+        v = moveWithoutHitting(worldHitbox(*((Entity*)demon)).circle,
+                               v,
+                               world->map->obstacles[i]);
     }
     demon->pos = Vector2Add(demon->pos, v);
     demon->rot = Vector2Angle(demon->targetPos, demon->pos) + 90;
@@ -209,7 +211,7 @@ void updateProjectiles(World *world, float delta) {
                 p->active = false;
                 continue;
             }
-            if (isOffMap(p->pos, world->map)) {
+            if (isOffMap(p->pos, *world->map)) {
                 p->active = false;
             }
         }
@@ -242,34 +244,31 @@ void drawEnemiesAndProj(World *world, Camera2D camera) {
 }
 
 bool didEntitiesCollide(Entity *e1, Entity *e2) {
-    if (e1->offsetHitbox.type == CIRCLE) {
-        Circle hb1 = e1->offsetHitbox.circle;
-        hb1.c = Vector2Add(hb1.c, e1->pos);
+    Hitbox hb1 = worldHitbox(*e1);
+    Hitbox hb2 = worldHitbox(*e2);
 
+    if (hb1.type == CIRCLE) {
         if (e2->offsetHitbox.type == CIRCLE) {
-            Circle hb2 = e2->offsetHitbox.circle;
-            hb2.c = Vector2Add(hb2.c, e2->pos);
-            return circlesColliding(hb1, hb2);
+            return circlesColliding(hb1.circle, hb2.circle);
         } else {
-            Rectangle hb2 = e2->offsetHitbox.rect;
-            hb2.x = e2->offsetHitbox.rect.x + e2->pos.x;
-            hb2.y = e2->offsetHitbox.rect.y + e2->pos.y;
-            return rectCircleColliding(hb2, hb1);
+            return rectCircleColliding(hb2.rect, hb1.circle);
         }
-    } else{
-        Rectangle hb1 = e1->offsetHitbox.rect;
-        hb1.x = e1->offsetHitbox.rect.x + e1->pos.x;
-        hb1.y = e1->offsetHitbox.rect.y + e1->pos.y;
+    } else {
+        if (e2->offsetHitbox.type == CIRCLE) {
+            return rectCircleColliding(hb1.rect, hb2.circle);
+        } else {
+            return CheckCollisionRecs(hb1.rect, hb2.rect);
+        }
+    }
+}
 
-        if (e2->offsetHitbox.type == CIRCLE) {
-            Circle hb2 = e2->offsetHitbox.circle;
-            hb2.c = Vector2Add(hb2.c, e2->pos);
-            return rectCircleColliding(hb1, hb2);
-        } else {
-            Rectangle hb2 = e2->offsetHitbox.rect;
-            hb2.x = e2->offsetHitbox.rect.x + e2->pos.x;
-            hb2.y = e2->offsetHitbox.rect.y + e2->pos.y;
-            return CheckCollisionRecs(hb1, hb2);
-        }
+Hitbox worldHitbox(Entity e) {
+    if (e.offsetHitbox.type == CIRCLE) {
+        Circle hb = e.offsetHitbox.circle;
+        return (Hitbox) { .circle = {Vector2Add(hb.c, e.pos), hb.r}, CIRCLE };
+    } else {
+        Rectangle hb = e.offsetHitbox.rect;
+        return (Hitbox) { .rect = { hb.x + e.pos.x, hb.y + e.pos.y,
+                                    hb.width, hb.height }, RECT };
     }
 }

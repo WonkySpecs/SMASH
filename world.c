@@ -20,8 +20,8 @@ void initMap(Map *map) {
     const int w = MAP_WIDTH * TILE_SIZE;
     const int h = MAP_HEIGHT * TILE_SIZE;
     map->obstacles = (Rectangle *)malloc(numObstacles * sizeof(Rectangle));
-    map->obstacles[0] = (Rectangle) {0, 0, w, 10};
-    map->obstacles[1] = (Rectangle) {0, 0, 10, h};
+    map->obstacles[0] = (Rectangle) {0, -10, w, 10};
+    map->obstacles[1] = (Rectangle) {-10, 0, 10, h};
     map->obstacles[2] = (Rectangle) {0, h, MAP_WIDTH * TILE_SIZE + 9, 10};
     map->obstacles[3] = (Rectangle) {w, 0, 10, h};
     map->numObstacles = numObstacles;
