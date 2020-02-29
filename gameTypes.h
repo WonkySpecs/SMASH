@@ -9,6 +9,7 @@
 	Vector2 pos;\
 	Vector2 vel;\
 	float rot;\
+    bool active; \
 }
 
 typedef struct World World;
@@ -21,6 +22,8 @@ typedef enum EntityState {
 typedef struct Entity {
     BASEFIELDS;
 } Entity;
+
+typedef Entity Projectile;
 
 typedef struct Hand {
     BASEFIELDS;
@@ -99,7 +102,9 @@ typedef struct World {
     Map *map;
     Demon *demon;
     Enemy *enemies;
-    int numEnemies;
+    int enemiesAllocated;
+    Projectile *projectiles;
+    int projAllocated;
     ParticleLayer *particles;
 } World;
 #endif

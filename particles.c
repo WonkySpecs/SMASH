@@ -126,3 +126,13 @@ void updateParticleEffects(World *world, float delta) {
     fireBreath->pos = Vector2Add(demon.pos, VecLenAngle(15, fireBreath->facing));
     updateParticleEmitter(fireBreath, delta);
 }
+
+void initParticleLayer(ParticleLayer *layer, Vector2 initPos) {
+    ParticleEmitter *emitters = calloc(10, sizeof(ParticleEmitter));
+    emitters[0] = newParticleEmitter(initPos,
+                                     LoadTexture("assets/lava_0.png"));
+    layer->fireBreath = emitters[0];
+    layer->lHand = emitters[1];
+    layer->rHand = emitters[2];
+    layer->dynamicEffects = &emitters[3];
+}

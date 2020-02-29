@@ -50,28 +50,44 @@ void initEnemies(Enemy *enemies) {
             .rot = 0, .maxSpeed = 2 + randFloat() - 0.5,
             .targetPos = (Vector2) {0, 0}, .update = &updateImp,
             .primThresh = 100, .primTimer = (int)(randFloat() * 100),
-            .state = NEUTRAL
+            .state = NEUTRAL,
+            .active = true
         };
         enemies[i] = enemy;
     }
+}
+
+const int INIT_ENEMIES_ALLOCATED = 100;
+const int INIT_PROJ_ALLOCATED = 100;
+
+void initWorld(World *world) {
+    Demon *demon = calloc(1, sizeof(Demon));
+    initDemon(demon);
+    Map *map = calloc(1, sizeof(Map));
+    initMap(map);
+    Enemy *enemies = calloc(INIT_ENEMIES_ALLOCATED, sizeof(Enemy));
+    initEnemies(enemies);
+    Projectile *projectiles = calloc(INIT_PROJ_ALLOCATED, sizeof(Projectile));
+    ParticleLayer *pl = calloc(1, sizeof(ParticleLayer));
+    initParticleLayer(pl);
+
+    world->map = map;
+    world->demon = demon;
+    world->enemies = enemies;
+    world->enemiesAllocated = INIT_ENEMIES_ALLOCATED;
+    world->projectiles = projectiles;
+    world->projAllocated = INIT_PROJ_ALLOCATED;
+    world->particles = pl;
 }
 
 int main() {
     InitWindow(W_WIDTH, W_HEIGHT, "Demon SMASH");
     SetTargetFPS(TARGET_FPS);
 
-    Demon demon = initDemon();
-    Map map = initMap();
-    ParticleLayer pl = (ParticleLayer) {
-        newParticleEmitter(demon.pos, LoadTexture("assets/lava_0.png")), 0, 0, 0
-    };
-    Enemy *enemies = malloc(10 * sizeof(Enemy));
-    initEnemies(enemies);
+    World world = {0};
+    initWorld(&world);
 
-    World world = { &map, &demon, enemies, 10, .particles = &pl};
-
-    Camera2D camera = initCamera(demon.pos);
-
+    Camera2D camera = initCamera(world.demon->pos);
     const float EXPECTED_FRAME_TIME = 1 / (float)NEUTRAL_FPS;
 
     RenderTexture2D particleTex = LoadRenderTexture(W_WIDTH, W_HEIGHT);
@@ -80,9 +96,9 @@ int main() {
         float delta = GetFrameTime() / EXPECTED_FRAME_TIME;
         ClearBackground(BLACK);
 
-        handleInputs(&demon, camera, delta);
+        handleInputs(world.demon, camera, delta);
         updateDemon(&world, delta);
-        updateCamera(&camera, demon);
+        updateCamera(&camera, *world.demon);
         updateEnemies(&world, delta);
         updateParticleEffects(&world, delta);
 
@@ -92,16 +108,18 @@ int main() {
                 ClearBackground(BLANK);
                 drawParticleLayer(*world.particles, camera);
             EndTextureMode();
-            drawMap(map, camera);
+            drawMap(*world.map, camera);
             drawEnemies(&world, camera);
-            drawEntity((Entity *)(&demon.rHand), camera);
-            drawEntity((Entity *)(&demon.lHand), camera);
+            drawEntity((Entity *)(&world.demon->rHand), camera);
+            drawEntity((Entity *)(&world.demon->lHand), camera);
             DrawTextureRec(particleTex.texture,
                            (Rectangle){ 0, 0,
                                         particleTex.texture.width, 
                                         -particleTex.texture.height },
                            (Vector2){ 0, 0 }, WHITE);
-            drawEntityScaled((Entity *)&demon, 1 + (demon.height) / 80, camera);
+            drawEntityScaled((Entity *)world.demon,
+                             1 + (world.demon->height) / 80,
+                             camera);
 
             if (DEBUG) {
                 DrawFPS(10, 10);
@@ -111,14 +129,14 @@ int main() {
                                                      camera);
                     DrawRectangle(pos.x, pos.y, obst.width, obst.height, PINK);
                 }
-                DrawCircleV(GetWorldToScreen2D(demon.pos, camera), 20, GREEN);
+                DrawCircleV(GetWorldToScreen2D(world.demon->pos, camera), 20, GREEN);
             }
         EndMode2D();
         EndDrawing();
     }
 
-    UnloadTexture(demon.texture);
-    UnloadTexture(demon.rHand.texture);
-    UnloadTexture(demon.lHand.texture);
+    UnloadTexture(world.demon->texture);
+    UnloadTexture(world.demon->rHand.texture);
+    UnloadTexture(world.demon->lHand.texture);
     CloseWindow();
 }

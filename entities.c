@@ -12,7 +12,7 @@ void updateHands(Demon *demon, float delta);
 const float HAND_X_OFFSET = 65;
 const float HAND_Y_OFFSET = 15;
 
-Demon initDemon() {
+void initDemon(Demon *demon) {
     Vector2 demonStartPos = (Vector2){W_WIDTH / 2, W_HEIGHT / 2};
     Image hand = LoadImage("assets/demon_hand.png");
     Hand rHand = {
@@ -36,15 +36,16 @@ Demon initDemon() {
     };
     UnloadImage(hand);
 
-    return (Demon) {
-        .texture = LoadTexture("assets/demon_head.png"),
-        .pos = demonStartPos,
-        .vel = Vector2Zero(),
-        .rot = 0.0,
-        .targetPos = Vector2Zero(),
-        .rHand = rHand, .lHand = lHand,
-        .height = 0.0, .zVel = 0.0, .trauma = 0.0
-    };
+    demon->texture = LoadTexture("assets/demon_head.png");
+    demon->pos = demonStartPos;
+    demon->vel = Vector2Zero();
+    demon->rot = 0.0;
+    demon->targetPos = Vector2Zero();
+    demon->rHand = rHand;
+    demon->lHand = lHand;
+    demon->height = 0.0;
+    demon->zVel = 0.0;
+    demon->trauma = 0.0;
 }
 
 void updateDemon(World *world, float delta) {
@@ -151,6 +152,7 @@ Vector2 calcImpTargetPos(Vector2 curPos, Vector2 demonPos) {
         diff.y + demonPos.y
     };
 }
+
 /*
     Imp uses primTimer/primThresh as:
         in NEUTRAL -> time since last attack / time required until next shot.
@@ -187,18 +189,18 @@ void updateImp(Enemy *imp, World *world, float delta) {
 }
 
 void updateEnemies(World *world, float delta) {
-    for (int i = 0; i < world->numEnemies; i ++) {
+    for (int i = 0; i < world->enemiesAllocated; i ++) {
         Enemy *e = &world->enemies[i];
-        if (e != 0) {
+        if (e->active) {
             e->update(e, world, delta);
         }
     }
 }
 
 void drawEnemies(World *world, Camera2D camera) {
-    for (int i = 0; i < world->numEnemies; i ++) {
+    for (int i = 0; i < world->enemiesAllocated; i ++) {
         Enemy *e = &world->enemies[i];
-        if (e != 0) {
+        if (e->active) {
             drawEntity((Entity *)e, camera);
         }
     }
