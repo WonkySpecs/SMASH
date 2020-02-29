@@ -94,3 +94,8 @@ void addProjectile(World *world, Projectile proj) {
     }
     world->projectiles[idx] = proj;
 }
+
+bool isOffMap(Vector2 pos, Map map) {
+    return (pos.x < 0 || pos.y < 0
+         || pos.x > MAP_WIDTH * TILE_SIZE || pos.y > MAP_HEIGHT * TILE_SIZE);
+}

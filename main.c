@@ -99,6 +99,7 @@ int main() {
         updateDemon(&world, delta);
         updateCamera(&camera, *world.demon);
         updateEnemies(&world, delta);
+        updateProjectiles(&world, delta);
         updateParticleEffects(&world, delta);
 
         BeginDrawing();
@@ -108,7 +109,7 @@ int main() {
                 drawParticleLayer(*world.particles, camera);
             EndTextureMode();
             drawMap(*world.map, camera);
-            drawEnemies(&world, camera);
+            drawEnemiesAndProj(&world, camera);
             drawEntity((Entity *)(&world.demon->rHand), camera);
             drawEntity((Entity *)(&world.demon->lHand), camera);
             DrawTextureRec(particleTex.texture,
@@ -128,7 +129,9 @@ int main() {
                                                      camera);
                     DrawRectangle(pos.x, pos.y, obst.width, obst.height, PINK);
                 }
-                DrawCircleV(GetWorldToScreen2D(world.demon->pos, camera), 20, GREEN);
+                DrawCircleV(GetWorldToScreen2D(world.demon->pos, camera),
+                            world.demon->offsetHitbox.circle.r,
+                            GREEN);
             }
         EndMode2D();
         EndDrawing();

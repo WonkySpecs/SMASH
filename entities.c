@@ -5,6 +5,7 @@
 #include "mathUtils.h"
 #include "constants.h"
 #include "drawing.h"
+#include "world.h"
 
 void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot, float delta);
 void updateHands(Demon *demon, float delta); 
@@ -13,11 +14,11 @@ const float HAND_X_OFFSET = 65;
 const float HAND_Y_OFFSET = 15;
 
 void initDemon(Demon *demon) {
-    Vector2 demonStartPos = (Vector2){W_WIDTH / 2, W_HEIGHT / 2};
+    Vector2 startPos = (Vector2){W_WIDTH / 2, W_HEIGHT / 2};
     Image hand = LoadImage("assets/demon_hand.png");
     Hand rHand = {
         .texture = LoadTextureFromImage(hand),
-        .pos = demonStartPos,
+        .pos = startPos,
         .vel = Vector2Zero(),
         .rot = 0,
         .speed = NEUTRAL_HAND_SPEED,
@@ -27,7 +28,7 @@ void initDemon(Demon *demon) {
     ImageFlipHorizontal(&hand);
     Hand lHand = {
         .texture = LoadTextureFromImage(hand),
-        .pos = demonStartPos,
+        .pos = startPos,
         .vel = Vector2Zero(),
         .rot = 0,
         .speed = NEUTRAL_HAND_SPEED,
@@ -37,7 +38,7 @@ void initDemon(Demon *demon) {
     UnloadImage(hand);
 
     demon->texture = LoadTexture("assets/demon_head.png");
-    demon->pos = demonStartPos;
+    demon->pos = startPos;
     demon->vel = Vector2Zero();
     demon->rot = 0.0;
     demon->targetPos = Vector2Zero();
@@ -46,6 +47,7 @@ void initDemon(Demon *demon) {
     demon->height = 0.0;
     demon->zVel = 0.0;
     demon->trauma = 0.0;
+    demon-> offsetHitbox = (Hitbox) {.circle = (Circle){Vector2Zero(), 15}, CIRCLE};
 }
 
 void updateDemon(World *world, float delta) {
@@ -178,12 +180,38 @@ void updateImp(Enemy *imp, World *world, float delta) {
     }
 
     if (imp->state == PREPARING) {
-        primTimeStateTransition(imp, imp->primThresh / 2.0, RECOVERING);
+        if(primTimeStateTransition(imp, imp->primThresh / 2.0, RECOVERING)) {
+            addProjectile(world,
+                          (Projectile){.pos = imp->pos,
+                                       .vel = Vector2Rotate((Vector2){3, 0},
+                                                            (imp->rot + 90) * DEG2RAD),
+                                       .active = true,
+                                       .offsetHitbox = (Hitbox) {
+                                           (Circle) { Vector2Zero(), 5}, CIRCLE
+                                       }});
+        }
     }
 
     if (imp->state == RECOVERING) {
         if (primTimeStateTransition(imp, imp->primThresh / 2.0, NEUTRAL)) {
             imp->targetPos = calcImpTargetPos(imp->pos, world->demon->pos);
+        }
+    }
+}
+
+void updateProjectiles(World *world, float delta) {
+    for (int i = 0; i < world->projAllocated; i ++) {
+        Projectile *p = &world->projectiles[i];
+        if (p && p->active) {
+            p->pos = Vector2Add(p->pos, Vector2Scale(p->vel, delta));
+            if (didEntitiesCollide((Entity*)p, (Entity*)world->demon)) {
+                puts("HIT");
+                p->active = false;
+                continue;
+            }
+            if (isOffMap(p->pos, world->map)) {
+                p->active = false;
+            }
         }
     }
 }
@@ -197,11 +225,51 @@ void updateEnemies(World *world, float delta) {
     }
 }
 
-void drawEnemies(World *world, Camera2D camera) {
+void drawEnemiesAndProj(World *world, Camera2D camera) {
     for (int i = 0; i < world->enemiesAllocated; i ++) {
         Enemy *e = &world->enemies[i];
         if (e && e->active) {
             drawEntity((Entity *)e, camera);
+        }
+    }
+    for (int i = 0; i < world->projAllocated; i ++) {
+        Projectile *p = &world->projectiles[i];
+        if (p && p->active) {
+            DrawCircleV(GetWorldToScreen2D(p->pos, camera), p->offsetHitbox.circle.r, BLUE);
+            // drawEntity((Entity *)p, camera);
+        }
+    }
+}
+
+bool didEntitiesCollide(Entity *e1, Entity *e2) {
+    if (e1->offsetHitbox.type == CIRCLE) {
+        Circle hb1 = e1->offsetHitbox.circle;
+        hb1.c = Vector2Add(hb1.c, e1->pos);
+
+        if (e2->offsetHitbox.type == CIRCLE) {
+            Circle hb2 = e2->offsetHitbox.circle;
+            hb2.c = Vector2Add(hb2.c, e2->pos);
+            return circlesColliding(hb1, hb2);
+        } else {
+            Rectangle hb2 = e2->offsetHitbox.rect;
+            hb2.x = e2->offsetHitbox.rect.x + e2->pos.x;
+            hb2.y = e2->offsetHitbox.rect.y + e2->pos.y;
+            return rectCircleColliding(hb2, hb1);
+        }
+    } else{
+        Rectangle hb1 = e1->offsetHitbox.rect;
+        hb1.x = e1->offsetHitbox.rect.x + e1->pos.x;
+        hb1.y = e1->offsetHitbox.rect.y + e1->pos.y;
+
+        if (e2->offsetHitbox.type == CIRCLE) {
+            Circle hb2 = e2->offsetHitbox.circle;
+            hb2.c = Vector2Add(hb2.c, e2->pos);
+            return rectCircleColliding(hb1, hb2);
+        } else {
+            Rectangle hb2 = e2->offsetHitbox.rect;
+            hb2.x = e2->offsetHitbox.rect.x + e2->pos.x;
+            hb2.y = e2->offsetHitbox.rect.y + e2->pos.y;
+            return CheckCollisionRecs(hb1, hb2);
         }
     }
 }

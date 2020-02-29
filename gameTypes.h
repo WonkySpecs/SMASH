@@ -3,6 +3,7 @@
 
 #include "raylib.h"
 #include "constants.h"
+#include "mathUtils.h"
 
 #define BASEFIELDS struct {\
 	Texture2D texture;\
@@ -10,6 +11,7 @@
 	Vector2 vel;\
 	float rot;\
     bool active; \
+    Hitbox offsetHitbox; \
 }
 
 typedef struct World World;
