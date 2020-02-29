@@ -191,7 +191,7 @@ void updateImp(Enemy *imp, World *world, float delta) {
 void updateEnemies(World *world, float delta) {
     for (int i = 0; i < world->enemiesAllocated; i ++) {
         Enemy *e = &world->enemies[i];
-        if (e->active) {
+        if (e && e->active) {
             e->update(e, world, delta);
         }
     }
@@ -200,7 +200,7 @@ void updateEnemies(World *world, float delta) {
 void drawEnemies(World *world, Camera2D camera) {
     for (int i = 0; i < world->enemiesAllocated; i ++) {
         Enemy *e = &world->enemies[i];
-        if (e->active) {
+        if (e && e->active) {
             drawEntity((Entity *)e, camera);
         }
     }

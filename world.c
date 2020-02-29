@@ -47,3 +47,50 @@ void drawMap(Map map, Camera2D camera) {
         }
     }
 }
+
+static const int addEnemyAllocs = 50;
+void allocMoreEnemies(World *world) {
+    world->enemiesAllocated += addEnemyAllocs;
+    world->enemies = realloc(world->enemies, world->enemiesAllocated * sizeof(Enemy));
+    for (int i = 0; i < addEnemyAllocs; i++){
+        world->enemies[world->enemiesAllocated - (i + 1)].active = false;
+    }
+}
+
+void addEnemy(World *world, Enemy enemy) {
+    int idx = world->enemiesAllocated;
+    for (int i = 0; i < world->enemiesAllocated; i++) {
+        if (!world->enemies[i].active) {
+            idx = i;
+            break;
+        }
+    }
+    if (idx == world->enemiesAllocated) {
+        allocMoreEnemies(world);
+    }
+    world->enemies[idx] = enemy;
+}
+
+static const int addProjAllocs = 100;
+void allocMoreProjectiles(World *world) {
+    world->projAllocated += addProjAllocs;
+    world->projectiles = realloc(world->projectiles,
+                                 world->projAllocated * sizeof(Projectile));
+    for (int i = 0; i < addProjAllocs; i++){
+        world->projectiles[world->projAllocated - (i + 1)].active = false;
+    }
+}
+
+void addProjectile(World *world, Projectile proj) {
+    int idx = world->projAllocated;
+    for (int i = 0; i < world->projAllocated; i++) {
+        if (!world->projectiles[i].active) {
+            idx = i;
+            break;
+        }
+    }
+    if (idx == world->projAllocated) {
+        allocMoreProjectiles(world);
+    }
+    world->projectiles[idx] = proj;
+}

@@ -40,7 +40,7 @@ void handleInputs(Demon *demon, Camera2D camera, float delta) {
     }
 }
 
-void initEnemies(Enemy *enemies) {
+void initEnemies(World *world) {
     Texture2D tex = LoadTexture("assets/beast.png");
     for (int i = 0; i < 10; i++) {
         Vector2 initPos = (Vector2){randFloat() * 800 + 200, randFloat() * 500 + 200};
@@ -53,7 +53,7 @@ void initEnemies(Enemy *enemies) {
             .state = NEUTRAL,
             .active = true
         };
-        enemies[i] = enemy;
+        addEnemy(world, enemy);
     }
 }
 
@@ -65,16 +65,15 @@ void initWorld(World *world) {
     initDemon(demon);
     Map *map = calloc(1, sizeof(Map));
     initMap(map);
-    Enemy *enemies = calloc(INIT_ENEMIES_ALLOCATED, sizeof(Enemy));
-    initEnemies(enemies);
+    world->enemies = calloc(INIT_ENEMIES_ALLOCATED, sizeof(Enemy));
+    world->enemiesAllocated = INIT_ENEMIES_ALLOCATED;
+    initEnemies(world);
     Projectile *projectiles = calloc(INIT_PROJ_ALLOCATED, sizeof(Projectile));
     ParticleLayer *pl = calloc(1, sizeof(ParticleLayer));
     initParticleLayer(pl);
 
     world->map = map;
     world->demon = demon;
-    world->enemies = enemies;
-    world->enemiesAllocated = INIT_ENEMIES_ALLOCATED;
     world->projectiles = projectiles;
     world->projAllocated = INIT_PROJ_ALLOCATED;
     world->particles = pl;

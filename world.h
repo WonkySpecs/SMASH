@@ -5,4 +5,7 @@
 
 void initMap(Map *map);
 void drawMap(Map map, Camera2D camera);
+
+void addEnemy(World *world, Enemy enemy);
+void addProjectile(World *world, Projectile proj);
 #endif
