@@ -31,7 +31,9 @@ endif()
 
 # This is the main part:
 
-add_executable(${PROJECT_NAME} main.c drawing.c mathUtils.c world.c entities.c particles.c tiles.c)
+aux_source_directory(. SRC_LIST)
+aux_source_directory(levels SRC_LIST)
+add_executable(${PROJECT_NAME} ${SRC_LIST})
 #set(raylib_VERBOSE 1)
 target_link_libraries(${PROJECT_NAME} raylib)
 # That's it! You should have an example executable that you can run. Have fun!
