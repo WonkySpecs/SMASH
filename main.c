@@ -93,14 +93,16 @@ int main() {
 
     while (!WindowShouldClose()) {
         float delta = GetFrameTime() / EXPECTED_FRAME_TIME;
-        ClearBackground(BLACK);
 
         handleInputs(world.demon, camera, delta);
+
         updateDemon(&world, delta);
         updateCamera(&camera, *world.demon);
         updateEnemies(&world, delta);
         updateProjectiles(&world, delta);
         updateParticleEffects(&world, delta);
+
+        ClearBackground(BLACK);
 
         BeginDrawing();
         BeginMode2D(camera);
