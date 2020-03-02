@@ -17,4 +17,20 @@
     data.
 */
 
+#include "gameTypes.h"
+#include "levels/infiniteImps.h"
+
+typedef enum Level {
+    INFINITE_IMPS
+} Level;
+
+typedef void (*levelUpdateFn)(World*, float);
+
+levelUpdateFn loadLevelUpdate(Level level) {
+    switch (level) {
+        case INFINITE_IMPS:
+            return infiniteImps_update;
+            break;
+    };
+}
 #endif

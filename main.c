@@ -10,6 +10,7 @@
 #include "constants.h"
 #include "mathUtils.h"
 #include "particles.h"
+#include "levels.h"
 
 const int TARGET_FPS = 120;
 const int NEUTRAL_FPS = 60;
@@ -86,6 +87,8 @@ int main() {
     World world = {0};
     initWorld(&world);
 
+    levelUpdateFn levelUpdate = loadLevelUpdate(INFINITE_IMPS);
+
     Camera2D camera = initCamera(world.demon->pos);
     const float EXPECTED_FRAME_TIME = 1 / (float)NEUTRAL_FPS;
 
@@ -101,6 +104,7 @@ int main() {
         updateEnemies(&world, delta);
         updateProjectiles(&world, delta);
         updateParticleEffects(&world, delta);
+        levelUpdate(&world, delta);
 
         ClearBackground(BLACK);
 
