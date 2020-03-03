@@ -4,6 +4,10 @@
 #include "mathUtils.h"
 
 Vector2 lastCameraTarget;
+char* textureNames[TEX_NAMES_SIZE] = {
+    "demon_head", "demon_hand", "beast"
+};
+Texture2D textures[TEX_NAMES_SIZE] = { 0 };
 
 Camera2D initCamera(Vector2 target) {
     Camera2D camera;
@@ -41,4 +45,13 @@ void updateCamera(Camera2D *camera, Demon demon) {
                                 (Vector2){baseOffset * (randFloat() * 2 - 1),
                                           baseOffset * (randFloat() * 2 - 1)});
     camera->rotation = 5 * demon.trauma * demon.trauma * (randFloat() - 0.5);
+}
+
+Texture2D getTexture(TextureName texName) {
+    if (textures[texName].id == 0) {
+        char filePath[256];
+        snprintf(filePath, sizeof(filePath), "assets/%s.png", textureNames[texName]);
+        textures[texName] = LoadTexture(filePath);
+    }
+    return textures[texName];
 }

@@ -38,7 +38,7 @@ void initDemon(Demon *demon) {
     };
     UnloadImage(hand);
 
-    demon->texture = LoadTexture("assets/demon_head.png");
+    demon->texture = getTexture(TEX_DEMON_HEAD);
     demon->pos = startPos;
     demon->vel = Vector2Zero();
     demon->rot = 0.0;

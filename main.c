@@ -42,7 +42,7 @@ void handleInputs(Demon *demon, Camera2D camera, float delta) {
 }
 
 void initEnemies(World *world) {
-    Texture2D tex = LoadTexture("assets/beast.png");
+    Texture2D tex = getTexture(TEX_IMP);
     for (int i = 0; i < 10; i++) {
         Vector2 initPos = (Vector2){randFloat() * 800 + 200, randFloat() * 500 + 200};
         Enemy enemy = {
