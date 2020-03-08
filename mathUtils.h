@@ -8,16 +8,6 @@ typedef struct Circle {
     float r;
 } Circle;
 
-typedef enum HitboxType { CIRCLE, RECT } HitboxType;
-
-typedef struct Hitbox {
-    union {
-        Circle circle;
-        Rectangle rect;
-    };
-    HitboxType type;
-} Hitbox;
-
 Vector2 Vector2ToLength(Vector2 vec, float len);
 Vector2 VecLenAngle(float len, float rads);
 Vector2 Vector2Rotate(Vector2 vec, float rads);

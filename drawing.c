@@ -55,3 +55,17 @@ Texture2D getTexture(TextureName texName) {
     }
     return textures[texName];
 }
+
+void drawEntityHitbox(Entity *e, Camera2D camera, Color c) {
+    if (e->offsetHitbox.type == RECT) {
+        Rectangle hb = e->offsetHitbox.rect;
+        Vector2 origin = {e->pos.x + hb.x, e->pos.y + hb.y};
+        DrawRectangleV(GetWorldToScreen2D(origin, camera),
+                       (Vector2) {hb.width, hb.height},
+                       c);
+    } else if (e->offsetHitbox.type == CIRCLE) {
+        Circle hb = e->offsetHitbox.circle;
+        DrawCircleV(GetWorldToScreen2D(Vector2Add(e->pos, hb.c), camera),
+                    hb.r, c);
+    }
+}

@@ -13,6 +13,7 @@ Camera2D initCamera(Vector2 target);
 void drawEntityScaled(Entity *e, float scale, Camera2D camera);
 void drawEntity(Entity *e, Camera2D camera);
 void updateCamera(Camera2D *camera, Demon demon);
+void drawEntityHitbox(Entity *e, Camera2D camera, Color c);
 
 Texture2D getTexture(TextureName tex);
 #endif

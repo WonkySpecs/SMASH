@@ -117,9 +117,12 @@ int main() {
                                                      camera);
                     DrawRectangle(pos.x, pos.y, obst.width, obst.height, PINK);
                 }
-                DrawCircleV(GetWorldToScreen2D(world.demon->pos, camera),
-                            world.demon->offsetHitbox.circle.r,
-                            GREEN);
+                drawEntityHitbox((Entity*)world.demon, camera, GREEN);
+                drawEntityHitbox((Entity*)&world.demon->rHand, camera, BLUE);
+                drawEntityHitbox((Entity*)&world.demon->lHand, camera, BLUE);
+                for (int i = 0; i < world.enemiesAllocated; i++) {
+                    drawEntityHitbox((Entity*)&world.enemies[i], camera, RED);
+                }
             }
         EndMode2D();
         EndDrawing();

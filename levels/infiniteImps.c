@@ -18,7 +18,10 @@ void spawnWave(int numImps, World *world) {
             .targetPos = (Vector2) {0, 0}, .update = &updateImp,
             .primThresh = 100, .primTimer = (int)(randFloat() * 100),
             .state = NEUTRAL,
-            .active = true
+            .active = true,
+            .offsetHitbox = (Hitbox) {
+                .rect = (Rectangle){-6, -18, 12, 36}, RECT
+            },
         };
         addEnemy(world, enemy);
     }

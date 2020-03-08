@@ -17,6 +17,16 @@
 typedef struct World World;
 
 // ### Entities ###
+typedef enum HitboxType { CIRCLE, RECT } HitboxType;
+
+typedef struct Hitbox {
+    union {
+        Circle circle;
+        Rectangle rect;
+    };
+    HitboxType type;
+} Hitbox;
+
 typedef enum EntityState {
     NEUTRAL, PREPARING, ATTACKING, RECOVERING,
 } EntityState;

@@ -25,6 +25,7 @@ void initDemon(Demon *demon) {
         .speed = NEUTRAL_HAND_SPEED,
         .targetPos = Vector2Zero(),
         .state = NEUTRAL,
+        .offsetHitbox = (Hitbox) {.circle = (Circle){Vector2Zero(), 20}, CIRCLE},
     };
     ImageFlipHorizontal(&hand);
     Hand lHand = {
@@ -35,6 +36,7 @@ void initDemon(Demon *demon) {
         .speed = NEUTRAL_HAND_SPEED,
         .targetPos = Vector2Zero(),
         .state = NEUTRAL,
+        .offsetHitbox = (Hitbox) {.circle = (Circle){Vector2Zero(), 20}, CIRCLE},
     };
     UnloadImage(hand);
 
