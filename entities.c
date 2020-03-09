@@ -8,7 +8,7 @@
 #include "world.h"
 
 void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot, float delta);
-void updateHands(Demon *demon, float delta); 
+void updateHands(World *world, float delta);
 Hitbox worldHitbox(Entity e);
 
 const float HAND_X_OFFSET = 65;
@@ -67,7 +67,7 @@ void updateDemon(World *world, float delta) {
     }
     demon->pos = Vector2Add(demon->pos, v);
     demon->rot = Vector2Angle(demon->targetPos, demon->pos) + 90;
-    updateHands(demon, delta);
+    updateHands(world, delta);
 
     bool wasInAir = demon->height > 0;
     demon->height += demon->zVel * delta;
@@ -87,14 +87,29 @@ void updateDemon(World *world, float delta) {
     if (demon->trauma > 0) demon->trauma -= 0.01;
 }
 
-void updateHands(Demon *demon, float delta) {
+void updateHands(World *world, float delta) {
     float waving = sin(GetTime() * 4);
     Vector2 rHandOffset = (Vector2){-HAND_X_OFFSET + waving * 3,
                                     HAND_Y_OFFSET + waving * 2};
     Vector2 lHandOffset = (Vector2){HAND_X_OFFSET - waving * 3,
                                     HAND_Y_OFFSET + waving * 2};
-    moveHand(&demon->rHand, demon->pos, rHandOffset, demon->rot, delta);
-    moveHand(&demon->lHand, demon->pos, lHandOffset, demon->rot, delta);
+    Demon *d = world->demon;
+    moveHand(&d->rHand, d->pos, rHandOffset, d->rot, delta);
+    moveHand(&d->lHand, d->pos, lHandOffset, d->rot, delta);
+    for (int i = 0; i < world->enemiesAllocated; i++) {
+        Enemy *e = &world->enemies[i];
+        if (!e) continue;
+        if (d->rHand.state == ATTACKING) {
+            if (didEntitiesCollide((Entity*) &d->rHand, (Entity*) e)) {
+                e->hit(e);
+            }
+        }
+        if (d->lHand.state == ATTACKING) {
+            if (didEntitiesCollide((Entity*) &d->lHand, (Entity*) e)) {
+                e->hit(e);
+            }
+        }
+    }
 }
 
 void moveHand(Hand *hand, Vector2 basePos, Vector2 neutralOffset, float rot, float delta) {
@@ -201,6 +216,20 @@ void updateImp(Enemy *imp, World *world, float delta) {
             imp->targetPos = calcImpTargetPos(imp->pos, world->demon->pos);
         }
     }
+
+    if (imp->state == DYING) {
+        if (imp->primTimer > imp->primThresh) {
+            imp->active = false;
+            return;
+        }
+        imp->rot += 12;
+    }
+}
+
+void hitImp(Enemy *self) {
+    self->state = DYING;
+    self->primTimer = 0;
+    self->primThresh = 40;
 }
 
 void updateProjectiles(World *world, float delta) {

@@ -15,7 +15,7 @@ void spawnWave(int numImps, World *world) {
             .texture = tex,
             .pos = initPos,
             .rot = 0, .maxSpeed = 2 + randFloat() - 0.5,
-            .targetPos = (Vector2) {0, 0}, .update = &updateImp,
+            .targetPos = (Vector2) {0, 0}, .update = &updateImp, .hit = &hitImp,
             .primThresh = 100, .primTimer = (int)(randFloat() * 100),
             .state = NEUTRAL,
             .active = true,

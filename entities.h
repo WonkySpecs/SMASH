@@ -15,4 +15,5 @@ bool didEntitiesCollide(Entity *e1, Entity *e2);
 /* Functions for enemy updates. These can be removed once constructors
 for enemy types are included in entities.c instead of happening in main */
 void updateImp(Enemy *self, World *world, float delta);
+void hitImp(Enemy *self);
 #endif

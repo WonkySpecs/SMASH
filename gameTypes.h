@@ -29,6 +29,7 @@ typedef struct Hitbox {
 
 typedef enum EntityState {
     NEUTRAL, PREPARING, ATTACKING, RECOVERING,
+    DYING,
 } EntityState;
 
 typedef struct Entity {
@@ -59,6 +60,7 @@ typedef struct Enemy Enemy;
 struct Enemy {
     BASEFIELDS;
     void (*update)(Enemy*, World*, float);
+    void (*hit)(Enemy*);
     Vector2 targetPos;
     float maxSpeed;
     float accel;
